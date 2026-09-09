@@ -4,13 +4,13 @@ description: 生成 benchmark 的原始输出，基线和 skill 两个条件，�
 
 # 跑 benchmark
 
-参数 `$ARGUMENTS`：`docs`、`replies`、`judge`，或者留空（先 docs 再 replies）。可以加 `--run <名字>`，默认 `run-<今天日期>`。批次目录是 `evals/results/<run>/`。
+参数 `$ARGUMENTS`：`docs`、`replies`、`judge`，或者留空（先 docs 再 replies）。可以加 `--run <名字>`，默认 `run-<今天日期>`。可以加 `--only baseline` 或 `--only skill`，只跑一个条件。批次目录是 `evals/results/<run>/`。
 
 这条命令代替 SimpleEnglish 的 `claude -p`。生成由子代理完成，打分由 Python 完成。不要自己打分。
 
 ## 准备
 
-1. 子代理看得到已安装的全部 skill。生成前禁用本插件和 simple-english 这类写作插件。不禁用，写 README 的任务会触发 skill，基线就不干净。桌面 App 用自带的内核：`~/Library/Application Support/Claude/claude-code/<版本>/claude.app/Contents/MacOS/claude plugin disable <插件>@<marketplace>`。生成完再 `enable`。
+1. 子代理看得到已安装的全部 skill，而且列表在会话开始时定下，会话中途禁用或卸载插件都不生效。所以先禁用本插件和 simple-english 这类写作插件，再新开一个会话跑生成。不这样做，写 README 的任务会触发 skill，基线就不干净。桌面 App 用自带的内核：`~/Library/Application Support/Claude/claude-code/<版本>/claude.app/Contents/MacOS/claude plugin disable <插件>@<marketplace>`。生成完再 `enable`。
 2. 用 Bash 读 `evals/scenarios.json` 和 `evals/reply_scenarios.json`。
 3. 用 Bash 取规则块：`prompts/system-prompt.md` 里两条 `---` 之间的文字。算它的 SHA256：`python3 -c "import re,hashlib,pathlib;t=pathlib.Path('prompts/system-prompt.md').read_text();print(hashlib.sha256(re.split(r'^---[ \t]*$',t,flags=re.M)[1].strip().encode()).hexdigest())"`。
 4. 如果 `evals/results/<run>/manifest.json` 不存在，写一个：`{"model": "sonnet", "effort": "<钉住的 effort，钉不住就写 inherited>", "date": "<今天>", "rule_block_sha256": "<上一步的值>", "harness": "claude-code-agent-tool 或 claude-code-workflow-tool", "plugins_disabled": [<禁用了哪些>], "user_claude_md": "present 或 absent"}`。有 Workflow 工具时用它生成，effort 钉为 low。
