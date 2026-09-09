@@ -17,7 +17,7 @@
   {
     "id": "error-message",
     "type": "procedural",
-    "prompt": "写 datasync 在 OSS 上传失败时打印的报错文本。失败原因是 RAM 账号缺少 oss:PutObject 权限。两到四行。只返回报错文本。"
+    "prompt": "用中文写 datasync 在 OSS 上传失败时打印的报错文本。失败原因是 RAM 账号缺少 oss:PutObject 权限。两到四行，报错文本本身也是中文，只保留权限名和命令等标识符为英文。只返回报错文本。"
   },
   {
     "id": "incident-report",

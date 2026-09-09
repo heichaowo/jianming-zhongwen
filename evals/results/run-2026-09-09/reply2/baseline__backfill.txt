@@ -1,0 +1,35 @@
+回填（backfill）就是给已存在的几千万行数据把新列的值补上，而不是让 NOT NULL 约束的检查在一条 ALTER 语句里对全表做。
+
+## 为什么直接 ALTER 卡住
+
+`ALTER TABLE ... ADD COLUMN x TYPE NOT NULL` 在多数库（MySQL/InnoDB、老版本 Postgres）会对整张表加排他锁、重写全表来验证每一行都满足 NOT NULL，20GB 的表这一步就是几分钟到几十分钟锁死写入。DBA 说的"先回填"就是把这个过程拆开、避免长时间锁表。
+
+## 标准做法（Postgres 举例，MySQL 类似）
+
+1. **加可空列**，不带约束，瞬间完成：
+```sql
+ALTER TABLE big_table ADD COLUMN new_col int;
+```
+
+2. **分批回填**，避免一个大事务长时间持锁、撑爆 WAL/undo：
+```sql
+-- 循环执行，每次几千到几万行，中间提交
+UPDATE big_table SET new_col = <默认值或计算值>
+WHERE id BETWEEN :start AND :end AND new_col IS NULL;
+```
+用主键范围分片或 `LIMIT` 子查询批量跑，每批之间 sleep 一下，减少对主库的压力和复制延迟。
+
+3. **给新写入设默认值**，如果这段时间业务还在插入新行，要么在应用层写入时带上这一列，要么先加个 trigger/default，保证回填期间新数据也不为空。
+
+4. **回填完成后，加约束**：
+- Postgres 用 `NOT VALID` 两步法最省事：
+  ```sql
+  ALTER TABLE big_table ADD CONSTRAINT chk_new_col_notnull CHECK (new_col IS NOT NULL) NOT VALID;
+  ALTER TABLE big_table VALIDATE CONSTRAINT chk_new_col_notnull;
+  ```
+  `NOT VALID` 只加只读元数据锁，`VALIDATE` 是只读扫描不锁写。Postgres 12+ 也可以直接 `ALTER COLUMN new_col SET NOT NULL`，只要有对应的 valid check constraint 打底，会走快速路径。
+- MySQL（InnoDB, 8.0+）大部分 `ADD COLUMN` 本身是 instant/online 的，但真正的坑是 `SET NOT NULL` 这一步依然要重建表，所以一样要先确认回填完了再加约束，且建议用 `ALGORITHM=INPLACE, LOCK=NONE`（或用 gh-ost/pt-online-schema-change）跑。
+
+## 现在该做的
+
+先看这次卡住的 ALTER 是哪一步（新增列还是加约束），把它 kill 掉/回滚，别让它继续占锁；然后按上面拆成"加可空列 → 分批 UPDATE → NOT VALID + VALIDATE（或对应工具）"来做。表多大、批多大、要不要用 gh-ost 之类的工具，取决于具体是 MySQL 还是 Postgres、以及这张表的写入 QPS，需要的话告诉我用的哪个库和大概写入量,我再给具体参数。

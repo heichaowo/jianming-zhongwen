@@ -1,0 +1,32 @@
+回填（backfill）就是给已有的存量数据把新列的值先补齐，再让 NOT NULL 约束生效——因为 NOT NULL 迁移要检查全表现有行是否都非空，20GB 表全表扫描/加锁改列会长时间锁表，所以要拆开做。
+
+做法：
+
+1. 先加列，但允许为空，不加 NOT NULL 约束，这一步很快（现代 PG/MySQL 不用重写全表）。
+2. 给列一个默认值（可选），新写入的行自动有值。
+3. 分批回填旧数据：用主键范围或游标，每次 UPDATE 一小批（比如几千到几万行），中间 sleep 一下，避免长事务、避免锁爆、避免主从延迟。例如：
+
+```sql
+UPDATE big_table SET new_col = <值>
+WHERE id BETWEEN :start AND :end AND new_col IS NULL;
+```
+
+循环推进 start/end，直到全表覆盖。
+
+4. 回填完之后，加 CHECK 约束（NOT VALID 方式，PG 支持），先不校验存量数据，只对新数据生效：
+
+```sql
+ALTER TABLE big_table ADD CONSTRAINT new_col_not_null CHECK (new_col IS NOT NULL) NOT VALID;
+```
+
+5. 再用 VALIDATE CONSTRAINT 单独校验，这一步只加共享锁，不阻塞读写：
+
+```sql
+ALTER TABLE big_table VALIDATE CONSTRAINT new_col_not_null;
+```
+
+6. 确认没问题后，可选择把 CHECK 约束转成真正的 NOT NULL（PG 15+ 之后加 NOT NULL 时如果发现有效的同语义 CHECK 约束会跳过全表扫描）。
+
+如果是 MySQL，情况不同：MySQL 加列/加约束多数场景本身走的是 in-place DDL 但仍会长时间持锁，实践中常用 pt-online-schema-change 或 gh-ost 做无锁变更，思路一样——影子表/触发器同步，分批回填，最后原子切换。
+
+关键点是把"一次性、锁全表"的操作拆成"加空列（快）+ 分批回填（不锁）+ 校验约束（轻锁）"三步，避免单个长事务或长时间排他锁卡住线上。

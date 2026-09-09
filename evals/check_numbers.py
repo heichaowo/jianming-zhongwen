@@ -52,7 +52,7 @@ def sync():
     if prompt != style:
         problems.append("rule block differs between prompts/system-prompt.md and output-styles/jianming-zhongwen.md")
     skill = (ROOT / "skills" / "jianming-zhongwen" / "SKILL.md").read_text(encoding="utf-8")
-    for phrase in ("最多 5 句", "第一句给答案", "不用破折号", "条件在前", "一词一义", "不动", "必须 / 不得", "不超过 30 字", "不超过 45 字"):
+    for phrase in ("最多 5 句", "第一句给答案", "不用破折号", "条件在前", "一词一义", "不动", "必须 / 不得", "不超过 30 字", "不超过 50 字"):
         for name, text in (("SKILL.md", skill), ("prompts/system-prompt.md", prompt)):
             if phrase not in text:
                 problems.append(f"{name} lacks the rule phrase {phrase!r}")

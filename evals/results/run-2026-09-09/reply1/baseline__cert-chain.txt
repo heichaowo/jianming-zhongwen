@@ -1,0 +1,40 @@
+这是 TLS 证书链验证失败，curl 找不到能验证服务器证书的根/中间证书。常见原因和修法：
+
+**原因**
+- 公司内部 API 用的是内部 CA（自签或私有 PKI）签发的证书，而系统的 CA 信任库里没有这个内部根证书。
+- 或者服务器没有把中间证书一起发出来（只发了叶子证书），导致链不完整。
+- 也可能是系统的 CA bundle 本身过期/损坏，或 curl 编译时指向了错误的 CA 路径。
+
+**修法（按推荐顺序）**
+
+1. 找内部 CA 根证书，加入系统信任库（正确做法，一次性解决所有工具的问题）
+   - 找 IT/安全团队要根证书文件（通常是 `.crt` 或 `.pem`）。
+   - macOS：
+     ```
+     sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain internal-ca.crt
+     ```
+   - Linux（Debian/Ubuntu）：
+     ```
+     sudo cp internal-ca.crt /usr/local/share/ca-certificates/internal-ca.crt
+     sudo update-ca-certificates
+     ```
+   - Linux（RHEL/CentOS）：
+     ```
+     sudo cp internal-ca.crt /etc/pki/ca-trust/source/anchors/
+     sudo update-ca-trust
+     ```
+
+2. 只让 curl 用这个证书验证（不改系统信任库，适合临时/单次场景）
+   ```
+   curl --cacert internal-ca.crt https://internal-api.company.com
+   ```
+
+3. 检查服务端证书链是否完整（如果你能控制服务端，或者要反馈给运维）
+   ```
+   openssl s_client -connect internal-api.company.com:443 -showcerts
+   ```
+   看返回的证书链里有没有中间证书，服务端 nginx/apache 配置里通常要把 fullchain（叶子证书+中间证书）而不是只有叶子证书配上去。
+
+**不要做的事**：不要用 `curl -k` / `--insecure` 长期绕过，那等于关闭了证书验证，中间人攻击也不会报错，只适合临时排查用一次，不能留在脚本或生产环境里。
+
+先跑一下 `openssl s_client -connect <host>:443 -showcerts` 看看链是否完整，能帮你确定是内部 CA 缺失还是服务端配置问题。

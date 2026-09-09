@@ -1,0 +1,25 @@
+这是本地信任链缺失或不完整，curl 找不到能验证服务器证书的根证书。常见原因和修法：
+
+**1. 系统缺 CA 证书包**
+- Debian/Ubuntu: `apt install ca-certificates && update-ca-certificates`
+- CentOS/RHEL: `yum install ca-certificates && update-ca-trust`
+- macOS (brew curl): `brew install ca-certificates`
+
+**2. 公司用了内部/自签 CA（最常见，尤其是内部 API）**
+说明链路上有企业根证书（自签 CA 或 MITM 代理如 Zscaler/网关）没有被系统信任。正确做法：
+- 找 IT 要内部根证书的 `.crt/.pem` 文件
+- 追加进系统信任库，而不是绕过验证：
+  - Linux: 放入 `/usr/local/share/ca-certificates/`，执行 `update-ca-certificates`
+  - macOS: 双击导入钥匙串，设为始终信任，或 `security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain internal-ca.pem`
+- 也可以只对这次 curl 指定：`curl --cacert /path/to/internal-ca.pem https://internal-api...`
+
+**3. curl 用了旧的/错的 CA bundle 路径**
+确认路径正确：`curl -v` 输出会显示用的是哪个 bundle；或显式指定 `--cacert $(curl-config --ca 2>/dev/null || echo /etc/ssl/certs/ca-certificates.crt)`。
+
+**4. 排查命令**
+```
+openssl s_client -connect internal-api.company.com:443 -showcerts
+```
+看返回的证书链，确认是否是自签或内部 CA 签发、链是否完整（服务器有没有把中间证书一起发出来）。
+
+**不要用 `-k/--insecure` 长期绕过**，那是彻底关掉验证，内部 API 也一样有被中间人攻击的风险；只在临时排障时用，正式环境应该把正确的 CA 装进信任库。

@@ -1,0 +1,9 @@
+## 故障排查
+
+**连接 MySQL 超时**
+
+检查目标数据库地址、端口是否可达，确认网络策略（安全组、VPC）放通了 datasync 所在节点。若网络正常，检查 MySQL 的 `max_connections` 是否已满，以及慢查询是否占满连接池。适当调大 datasync 的连接超时配置，并加重试。
+
+**OSS 返回 AccessDenied**
+
+优先检查 AccessKey 是否过期或被禁用，其次检查 Bucket 策略与 RAM 权限是否包含对应的读写 Action（如 `PutObject`/`GetObject`）。确认请求的 Bucket 名称、Region 与配置一致，跨区域访问会导致该错误。若使用了 STS 临时凭证，检查其是否已过期。

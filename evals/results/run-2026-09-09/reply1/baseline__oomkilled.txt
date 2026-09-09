@@ -1,0 +1,24 @@
+Pod 被 OOMKilled 说明容器实际内存用量超过了它的 memory limit，内核 cgroup 直接把进程杀掉，Kubernetes 再按重启策略把它拉起来，于是看到反复重启。
+
+常见原因：
+
+1. **limit 设得太低**，正常负载就超过了——最常见的情况，尤其是默认值抄别的服务、或没设过 limit/request。
+2. **应用本身有内存泄漏**，运行越久占用越高，最终撞到 limit。
+3. **瞬时负载/大请求**（大批量任务、大文件、大查询结果一次性加载到内存）导致峰值超限，即使平均用量不高。
+4. **JVM/Node 等运行时没有感知 cgroup limit**，比如老版本 JVM 按宿主机总内存算堆大小，而不是按 container limit，导致堆本身就比 limit 大。
+5. **limit 和 request 差距过大**，节点内存紧张时该 Pod 更容易被限制/驱逐到边界。
+
+排查步骤：
+
+- `kubectl describe pod <pod>`看 `Last State: Terminated Reason: OOMKilled`，以及 `exit code 137`。
+- `kubectl top pod <pod>`（需要 metrics-server）看实际内存曲线，或接 Prometheus 看历史趋势，判断是缓慢泄漏还是瞬时尖峰。
+- 看应用日志，是否在 OOM 前有大批量处理的迹象。
+
+要改什么，取决于原因：
+
+- 如果只是限制太紧但用量正常：调高 `resources.limits.memory`（同时相应调整 `requests.memory`，避免 request/limit 差距过大）。
+- 如果是运行时不认 cgroup limit（老 JVM）：升级 JVM 版本或加 `-XX:+UseContainerSupport`（新版本默认开启），或显式设置 `-Xmx` 略低于 container limit。
+- 如果是真的内存泄漏：需要代码层面排查（heap dump/profiling），扩大 limit 只是临时缓解，治标不治本。
+- 如果是瞬时大批量任务：考虑限流、分批处理，或把这类任务挪到有更高资源余量的地方（如单独的 Job/队列消费）。
+
+一般思路是先用 `kubectl describe`和监控确认是"限制太低"还是"用量异常"，再对症调整，而不是一上来就盲目调高 limit。

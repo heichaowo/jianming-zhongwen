@@ -36,7 +36,7 @@ slug `jianming-zhongwen`，显示名「简明技术中文」，仓库 `heichaowo
 
 ### 2.4 文档规则（16 条）
 
-1. 先分类。程序性文本用祈使句，一句一个动作，每句不超过 30 字。描述性文本用陈述句，每句不超过 45 字，一段一个主题，一段不超过 6 句。逗号分句不超过 40 字。
+1. 先分类。程序性文本用祈使句，一句一个动作，每句不超过 30 字。描述性文本用陈述句，每句不超过 50 字，一段一个主题，一段不超过 6 句。逗号分句不超过 40 字。
 2. 不动代码、命令、路径、报错原文、产品名和事实。原文没有的数字和原因不补。
 3. 条件在前，动作在后，逗号分隔。
 4. 用实义动词。不用 进行 / 作出 / 予以 / 加以 / 开展 / 实施 加名词。
@@ -90,6 +90,8 @@ slug `jianming-zhongwen`，显示名「简明技术中文」，仓库 `heichaowo
 校准协议：先跑无 skill 的基线（8 个文档场景，sonnet），用 linter 取所有句子的字数分布。程序性和描述性分开算 P70，向上取整到 5 的倍数。程序性落在 25 到 35 之间、描述性落在 40 到 50 之间就用校准值，否则保留暂定值并写明。分句线 40 字不校准，只报告 P90 是否超过。结果记在本文件第 5 节，不进 README。校准前 README 不发布任何上限有效性的数字。
 
 拒绝：从「1 英文词等于 1.5 汉字」推导上限。核查发现这个换算引的是语音信息率研究，用在书面字数上是类别错误。
+
+2026-09-09 校准结果见第 5 节：程序性 30 维持，描述性从 45 改为 50，分句 40 维持。v0.1.1 起生效。
 
 ### 2.8 测量
 
@@ -197,11 +199,28 @@ jianming-zhongwen/
 - [x] 3 插件（2026-09-09，App 内验证：新会话有规则注入，Stop hook 提示）
 - [x] 4 benchmark 脚本（2026-09-09）
 - [x] 5 CI 与 v0.1.0（2026-09-09，Actions 全绿，从 GitHub 安装验证通过）
-- [ ] 6 校准与 v1.0.0
+- [ ] 6 校准与 v1.0.0：基线已跑，上限已校准（v0.1.1），skill 条件和评委待跑
 
 ## 5. 测量
 
-校准结果和 benchmark 原始分布记在这里。目前为空。
+### 5.1 基线校准，2026-09-09
+
+批次 `evals/results/run-2026-09-09`。manifest：sonnet，effort low，Workflow 工具生成，本插件已卸载，simple-english 已禁用，用户的 CLAUDE.md 在场。
+
+文档 8 篇。报错文本场景的基线是英文，提示词没说要中文，不计入，提示词已改，这个场景要重跑。剩下 7 篇共 27 个中文句子。
+
+| 类型 | 句数 | P50 | P70 | P90 | 最长 | 分句数 | 分句 P90 | 分句超 40 字 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 程序性 | 13 | 23 | 29 | 42 | 57 | 22 | 25 | 0 |
+| 描述性 | 14 | 21 | 49 | 86 | 112 | 43 | 20 | 1 |
+
+按 2.7 的规则：程序性 P70 是 29，取整到 30，落在 25 到 35 之间，维持 30。描述性 P70 是 49，取整到 50，落在 40 到 50 之间，从 45 改为 50。分句线 40 不校准，65 个分句里 1 个超过。
+
+样本小。描述性的 14 个句子里，32 字和 49 字之间是空的，少一个长句 P70 就是 32。第二轮基线跑完重算，P70 落到 45 以下就改回 45。
+
+回复基线 16 条：平均 510 字，13.8 句，0 条在 5 句以内，破折号 16，加粗 54，标题 3，列表项 109，可见缺陷合计 322。开场白和结束语都是 0，这个模型在 low effort 下直接给答案。
+
+文档基线 7 篇中文加 1 篇英文：描述性上限 45 时每千字违规 13.70，改为 50 后 12.72。发布的数字以当时的 linter 重算为准。
 
 ---
 
@@ -243,7 +262,7 @@ The document (what you write or rewrite) and the reply (what you type in chat) e
 
 ### 2.4 Document rules (16)
 
-1. Classify first. Procedural text: imperative, one action per sentence, 30 characters per sentence. Descriptive text: declarative, 45 characters per sentence, one topic per paragraph, six sentences per paragraph. A comma clause has 40 characters at most.
+1. Classify first. Procedural text: imperative, one action per sentence, 30 characters per sentence. Descriptive text: declarative, 50 characters per sentence, one topic per paragraph, six sentences per paragraph. A comma clause has 40 characters at most.
 2. Do not touch code, commands, paths, quoted errors, product names, or facts. Do not add numbers or causes the source did not give.
 3. Condition first, then the action, with a comma.
 4. Use full verbs. No 进行 / 作出 / 予以 / 加以 / 开展 / 实施 plus a noun.
@@ -297,6 +316,8 @@ There are two modes only: standard (default, all rules above) and check (when th
 Calibration protocol: run the no-skill baseline first (8 document scenarios, sonnet) and take the sentence-length distribution from the linter. Compute P70 for procedural and descriptive sentences separately and round up to a multiple of 5. Use the calibrated value when procedural lands in 25 to 35 and descriptive in 40 to 50. Otherwise keep the provisional value and say so. The 40-character clause line is not calibrated. Report only whether P90 exceeds it. Results go in section 5 of this file, not in the README. Before calibration the README publishes no number about cap effectiveness.
 
 Rejected: deriving the caps from "one English word equals 1.5 characters". Verification found that this ratio cites speech information-rate research. Applied to written character counts it is a category error.
+
+The calibration of 2026-09-09 is in section 5: procedural stays at 30, descriptive goes from 45 to 50, the clause line stays at 40. In effect from v0.1.1.
 
 ### 2.8 Measurement
 
@@ -366,4 +387,21 @@ Each phase has one observable completion check.
 
 ## 5. Measurements
 
-Calibration results and raw benchmark distributions go here. Empty for now.
+### 5.1 Baseline calibration, 2026-09-09
+
+Run `evals/results/run-2026-09-09`. Manifest: sonnet, effort low, generated with the Workflow tool, this plugin uninstalled, simple-english disabled, the user's CLAUDE.md present.
+
+Eight documents. The error-message baseline came back in English because the prompt did not ask for Chinese. It is excluded, the prompt is fixed, and that scenario needs a rerun. The other seven documents hold 27 Chinese sentences.
+
+| Type | Sentences | P50 | P70 | P90 | Longest | Clauses | Clause P90 | Clauses over 40 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| procedural | 13 | 23 | 29 | 42 | 57 | 22 | 25 | 0 |
+| descriptive | 14 | 21 | 49 | 86 | 112 | 43 | 20 | 1 |
+
+By the rule in 2.7: procedural P70 is 29, rounded to 30, inside 25 to 35, so 30 stays. Descriptive P70 is 49, rounded to 50, inside 40 to 50, so 45 becomes 50. The clause line of 40 is not calibrated; 1 of 65 clauses exceeds it.
+
+The sample is small. Among the 14 descriptive sentences nothing falls between 32 and 49 characters, so one fewer long sentence would give a P70 of 32. After a second baseline run the number is recomputed, and if P70 falls below 45 the cap goes back to 45.
+
+Reply baseline, 16 replies: 510 characters and 13.8 sentences on average, 0 within five sentences, 16 dashes, 54 bold spans, 3 headers, 109 list items, 322 visible defects in total. Openers and closers are both 0; this model at low effort starts with the answer.
+
+Document baseline, 7 Chinese documents plus 1 English: 13.70 violations per 1000 characters with the descriptive cap at 45, 12.72 with the cap at 50. Published numbers are whatever the linter of the day recomputes.

@@ -1,0 +1,3 @@
+Error: OSS upload failed: AccessDenied - RAM user does not have oss:PutObject permission for this bucket.
+Please grant oss:PutObject to the RAM account and retry.
+datasync exiting with status 1.

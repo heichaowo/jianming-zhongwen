@@ -1,0 +1,28 @@
+## 快速开始
+
+安装 datasync：
+
+```
+curl -sSL https://get.datasync.dev/install.sh | sh
+```
+
+编辑 `datasync.yaml`，填入 MySQL 连接地址和 OSS 的 AccessKey：
+
+```yaml
+source:
+  mysql:
+    dsn: "user:pass@tcp(127.0.0.1:3306)/dbname"
+target:
+  oss:
+    access_key_id: "your-access-key-id"
+    access_key_secret: "your-access-key-secret"
+    bucket: "your-bucket"
+```
+
+运行首次同步：
+
+```
+datasync run --config datasync.yaml
+```
+
+同步完成后，MySQL 中的数据即写入指定的 OSS bucket。

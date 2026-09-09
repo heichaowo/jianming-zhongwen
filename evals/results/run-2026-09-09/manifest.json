@@ -1,0 +1,9 @@
+{
+  "model": "sonnet",
+  "effort": "low",
+  "date": "2026-09-09",
+  "rule_block_sha256": "ded6ea81ff9be033954a00d4f5c2553b9854dfe226ac9b011a60388c835ae578",
+  "harness": "claude-code-workflow-tool",
+  "plugins_disabled": ["jianming-zhongwen（已卸载）", "simple-english"],
+  "user_claude_md": "present"
+}

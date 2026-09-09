@@ -1,7 +1,7 @@
 # 简明技术中文 jianming-zhongwen
 
 <p>
-  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-0.1.0-blue?style=flat" alt="version 0.1.0"></a>
+  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-0.1.1-blue?style=flat" alt="version 0.1.1"></a>
   <a href="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml"><img src="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml/badge.svg" alt="check"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat" alt="MIT"></a>
 </p>
@@ -39,7 +39,7 @@ npx skills add heichaowo/jianming-zhongwen
 
 | 规则 | 它删掉什么 |
 |---|---|
-| 程序性每句不超过 30 字，描述性不超过 45 字，逗号分句不超过 40 字 | 一口气读不完的句子 |
+| 程序性每句不超过 30 字，描述性不超过 50 字，逗号分句不超过 40 字 | 一口气读不完的句子 |
 | 用实义动词，不用 进行 / 作出 / 予以 / 加以 加名词 | 「对配置进行修改」 |
 | 情态词按阶梯：必须 / 建议 / 可以 / 能 / 可能，各管一件事 | 「应该」到底是要求还是猜测 |
 | 条件在前，动作在后 | 读者做完了才看到的「如果」 |
@@ -63,7 +63,7 @@ npx skills add heichaowo/jianming-zhongwen
 
 完整规则在 [SKILL.md](skills/jianming-zhongwen/SKILL.md)，编号目录和各类文档的结构在 [rule-catalog.md](skills/jianming-zhongwen/references/rule-catalog.md)，替换表在 [word-swaps.md](skills/jianming-zhongwen/references/word-swaps.md)。
 
-三个字数上限是暂定值。校准协议和结果在 [docs/design.md](docs/design.md) 第 2.7 节和第 5 节。
+三个字数上限经 2026-09-09 的基线校准，样本是 8 篇文档的 27 个中文句子。校准协议和结果在 [docs/design.md](docs/design.md) 第 2.7 节和第 5 节。
 
 ## 实测
 
@@ -97,7 +97,7 @@ MIT。GB/T 条文只转述不复制。不含任何 ASD-STE100 词典内容。
 
 # jianming-zhongwen (Plain Technical Chinese)
 
-An agent skill that makes a model write technical documents and replies in Chinese that a reader understands on one read. The rules are countable and a regex can find them: a procedural sentence has 30 characters at most, modals come from five pairs only, no 进行 / 作出 plus a noun, a reply has five sentences at most.
+An agent skill that makes a model write technical documents and replies in Chinese that a reader understands on one read. The rules are countable and a regex can find them: a procedural sentence has 30 characters at most, a descriptive one 50, modals come from five pairs only, no 进行 / 作出 plus a noun, a reply has five sentences at most.
 
 The rules come from Chinese sources: 余光中's critique of Europeanized Chinese, 阮一峰's technical-writing guide, the modal-verb table in GB/T 1.1-2020 Annex C, and the punctuation rules in GB/T 15834-2011. AI tells are a second guard layer, based on the lieflat corpus and the CCL 2023 measurements. The research and the reason for each decision are in [docs/design.md](docs/design.md).
 
@@ -130,7 +130,7 @@ The document register covers README files, runbooks, troubleshooting, error text
 
 The full rules are in [SKILL.md](skills/jianming-zhongwen/SKILL.md). The numbered catalog with the structure of each document type is in [rule-catalog.md](skills/jianming-zhongwen/references/rule-catalog.md). The swap table is in [word-swaps.md](skills/jianming-zhongwen/references/word-swaps.md).
 
-The three character caps are provisional. The calibration protocol and its results are in [docs/design.md](docs/design.md), sections 2.7 and 5.
+The three character caps were calibrated on 2026-09-09 against a baseline of 8 documents, 27 Chinese sentences. The protocol and the results are in [docs/design.md](docs/design.md), sections 2.7 and 5.
 
 ## Measurements
 

@@ -1,0 +1,29 @@
+OOMKilled 表示容器实际内存用量超过了它的 limit，被内核 cgroup OOM killer 杀掉，kubelet 重启后又撞限重复循环。
+
+常见原因：
+
+1. **limit 设得太低**——应用正常工作集本来就超过这个数（JVM/Node 堆、缓存、连接池都会占内存）。
+2. **内存泄漏**——RSS 随时间单调上升，重启前用量曲线是斜线而不是平台。
+3. **突发负载**——批处理、大文件解析、并发请求峰值瞬间冲高。
+4. **limit 与 request 差距过大**——调度器按 request 分配节点，但节点实际内存被别的 Pod 挤占后，你这个 Pod 的 limit 撑不住。
+5. **JVM 等运行时没读 cgroup limit**——老版本 JDK 默认按宿主机总内存算堆大小，而不是容器 limit，导致堆本身就超限。
+
+排查步骤：
+
+```bash
+kubectl describe pod <pod>      # 看 Last State: Terminated Reason: OOMKilled，及 exit code 137
+kubectl top pod <pod>           # 当前内存用量
+kubectl get pod <pod> -o yaml | grep -A3 resources   # 确认 request/limit
+```
+
+如果有历史监控（Prometheus/Grafana），看 `container_memory_working_set_bytes` 曲线，判断是泄漏还是峰值。
+
+要改什么：
+
+- **先确认真实需求**，别拍脑袋加 limit。用 `kubectl top` 或监控看正常运行时的实际用量，limit 设为峰值的 1.3～1.5 倍左右。
+- **request 和 limit 别差太多**，否则该 Pod 更容易在节点内存紧张时被优先杀（QoS 变成 Burstable 而非 Guaranteed）。
+- 如果是 JVM 应用，确认镜像里 JDK ≥ 10（或加了 `-XX:+UseContainerSupport`），并显式设置 `-XX:MaxRAMPercentage`（比如 75），别让堆漫到 limit 之上。
+- 如果曲线是持续上升的泄漏，改配置解决不了，需要定位代码里的泄漏点（连接未关闭、缓存无上限增长等）。
+- 如果是突发负载导致，考虑加 HPA 横向扩容，或者给该类任务单独限流/分批处理，而不是一味加大单 Pod 的 limit。
+
+一句话：先用 `kubectl describe` 确认真是 OOM（而不是探针失败之类的其他重启），再用实际用量数据定出合理的 limit，同时排查是不是有内存泄漏。

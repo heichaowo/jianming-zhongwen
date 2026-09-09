@@ -1,0 +1,9 @@
+datasync v2.0 发布。
+
+破坏性变更：`/v2/users` 接口的 `name` 字段拆分为 `first_name` 和 `last_name`，依赖该字段的客户端需同步调整。
+
+新特性：新增 `--incremental` 参数，支持增量同步。
+
+性能：Parquet 写入速度提升 40%。
+
+升级前请检查对 `name` 字段的直接依赖。

@@ -29,7 +29,7 @@ ROOT = HERE.parent
 SLOP_TSV = ROOT / "skills" / "jianming-zhongwen" / "references" / "slop-zh.tsv"
 
 CJK_ALNUM = re.compile(r"[㐀-䶿一-鿿豈-﫿A-Za-z0-9]")
-LIMITS = {"procedural": 30, "descriptive": 45}
+LIMITS = {"procedural": 30, "descriptive": 50}  # calibrated 2026-09-09, docs/design.md section 5
 CLAUSE_LIMIT = 40
 REPLY_CAP = 5
 
@@ -283,7 +283,8 @@ def self_test() -> None:
     assert char_count(strip_code("运行 `datasync run` 命令")) == 5
     cell = lint(TABLE_FIXTURE, "descriptive")["violations"]
     assert cell["banned_modal"] == 1 and cell["sentence_over_limit"] == 0, cell
-    assert lint("一" * 50 + "。", "descriptive")["violations"]["sentence_over_limit"] == 1
+    assert lint("一" * 55 + "。", "descriptive")["violations"]["sentence_over_limit"] == 1
+    assert lint("一" * 50 + "。", "descriptive")["violations"]["sentence_over_limit"] == 0
     assert lint("一" * 45 + "，好。", "descriptive")["violations"]["clause_over_limit"] == 1
     assert lint("# 这是一个很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长的标题\n", "procedural")["violations"]["sentence_over_limit"] == 0
     front = "---\ndescription: " + "长" * 60 + "\n---\n\n运行命令。\n"
