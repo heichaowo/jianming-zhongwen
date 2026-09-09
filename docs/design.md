@@ -191,7 +191,7 @@ jianming-zhongwen/
 
 进度板：
 
-- [ ] 0 前提
+- [x] 0 前提：仓库 heichaowo/jianming-zhongwen 已建（2026-09-09）；本地目录改名待用户
 - [x] 1 linter（2026-09-09）
 - [x] 2 规则文件（2026-09-09）
 - [x] 3 插件（2026-09-09，App 内验证：新会话有规则注入，Stop hook 提示）
