@@ -58,6 +58,11 @@ class LintHookTest(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r)
         self.assertEqual(r.stderr, "")
 
+    def test_english_markdown_is_ignored(self):
+        english = "## 0.1.0, 2026-09-09\n\n- First version with a document register and a reply register, a linter, hooks, and a benchmark command that runs inside Claude Code.\n"
+        r = run(post_event(self.write("CHANGELOG.md", english)))
+        self.assertEqual(r.returncode, 0, r)
+
     def test_non_markdown_is_ignored(self):
         r = run(post_event(self.write("doc.py", SLOP)))
         self.assertEqual(r.returncode, 0, r)
