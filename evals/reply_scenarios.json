@@ -1,0 +1,10 @@
+[
+  {"id": "idempotent", "term": "幂等", "prompt": "我们的部署脚本在超时后会重试 POST /v2/orders。这样安全吗？接口文档说它是幂等的，我不太清楚幂等到底是什么意思。简短解释一下。"},
+  {"id": "sharding", "term": "分库分表", "prompt": "一张 MySQL 表有 4000 万行，查询越来越慢。同事说要分库分表。我应该先做什么？"},
+  {"id": "cert-chain", "term": "证书链", "prompt": "curl 访问公司内部 API 报「SSL certificate problem: unable to get local issuer certificate」。这是怎么回事，怎么修？"},
+  {"id": "consumer-lag", "term": "消费积压", "prompt": "Kafka 监控显示消费积压涨到了 200 万条。这严重吗？对用户有什么影响？"},
+  {"id": "oomkilled", "term": "OOMKilled", "prompt": "一个 Kubernetes Pod 一直以 OOMKilled 状态重启。发生了什么，我要改什么？"},
+  {"id": "token-bucket", "term": "令牌桶", "prompt": "我们想给 API 限流，每个用户每分钟最多 100 次。同事建议用令牌桶。用简单的话解释一下，并说说它适不适合。"},
+  {"id": "backfill", "term": "回填", "prompt": "给一张 20 GB 的表加了一个 NOT NULL 列，迁移一直卡着。DBA 说要先回填。回填是什么，我该怎么做？"},
+  {"id": "cache-invalidation", "term": "缓存失效", "prompt": "我们改了商品价格，用户最多 10 分钟后还看到旧价格。数据库前面有 Redis。为什么会这样，怎么修？"}
+]

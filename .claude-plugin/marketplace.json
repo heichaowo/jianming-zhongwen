@@ -1,0 +1,24 @@
+{
+  "name": "jianming-zhongwen",
+  "owner": {
+    "name": "heichaowo",
+    "url": "https://github.com/heichaowo"
+  },
+  "description": "简明技术中文：硬规则、回复寄存器、可复算的 benchmark。",
+  "plugins": [
+    {
+      "name": "jianming-zhongwen",
+      "source": "./",
+      "displayName": "简明技术中文",
+      "description": "用简明技术中文写作：短句、实义动词、条件在前、情态词按阶梯、一词一义、术语首次出现时定义。回复最多 5 句，只用散文。",
+      "version": "0.1.0",
+      "author": {
+        "name": "heichaowo"
+      },
+      "homepage": "https://github.com/heichaowo/jianming-zhongwen",
+      "repository": "https://github.com/heichaowo/jianming-zhongwen",
+      "license": "MIT",
+      "keywords": ["technical-writing", "documentation", "chinese", "plain-language"]
+    }
+  ]
+}

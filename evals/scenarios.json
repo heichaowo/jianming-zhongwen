@@ -1,0 +1,42 @@
+[
+  {
+    "id": "readme-intro",
+    "type": "descriptive",
+    "prompt": "为命令行工具 datasync 写 README 的简介段落，一到两段，约 120 字。datasync 把 MySQL 表同步到阿里云 OSS，存为 Parquet 文件。只返回正文。"
+  },
+  {
+    "id": "getting-started",
+    "type": "procedural",
+    "prompt": "为 datasync 写「快速开始」一节，约 150 字：用 `curl -sSL https://get.datasync.dev/install.sh | sh` 安装，编辑 datasync.yaml 填写 MySQL 地址和 OSS 的 AccessKey，运行 `datasync run --config datasync.yaml` 做第一次同步。只返回正文。"
+  },
+  {
+    "id": "troubleshooting",
+    "type": "procedural",
+    "prompt": "为 datasync 写故障排查一节，约 150 字，覆盖两种情况：连接 MySQL 超时，OSS 返回 AccessDenied。只返回正文。"
+  },
+  {
+    "id": "error-message",
+    "type": "procedural",
+    "prompt": "写 datasync 在 OSS 上传失败时打印的报错文本。失败原因是 RAM 账号缺少 oss:PutObject 权限。两到四行。只返回报错文本。"
+  },
+  {
+    "id": "incident-report",
+    "type": "descriptive",
+    "prompt": "写一份公开状态页的事故报告，约 100 字：北京时间 14:02 到 14:31，12% 的 API 请求返回 HTTP 502，原因是一次发布删掉了缓存预热步骤，14:27 回滚。只返回正文。"
+  },
+  {
+    "id": "release-notes",
+    "type": "descriptive",
+    "prompt": "写 datasync v2.0 的发布说明，约 120 字：`/v2/users` 接口的 `name` 字段拆成 `first_name` 和 `last_name`（破坏性变更）；新增 `--incremental` 参数；Parquet 写入快了 40%。只返回正文。"
+  },
+  {
+    "id": "runbook-terse",
+    "type": "procedural",
+    "prompt": "把这条操作手册的步骤改到最短，意思不变：「在执行数据迁移之前，请务必确认备份文件已经存在并且可用。」只返回改写后的步骤。"
+  },
+  {
+    "id": "architecture",
+    "type": "descriptive",
+    "prompt": "写 datasync 的架构概述，约 130 字：读取进程按批次从 MySQL 流式读取行；转换进程把每批数据转成 Parquet 行组；上传进程用分片上传把对象写入 OSS，失败自动重试。只返回正文。"
+  }
+]
