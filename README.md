@@ -1,7 +1,7 @@
 # 简明技术中文 jianming-zhongwen
 
 <p>
-  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-1.0.3-blue?style=flat" alt="version 1.0.3"></a>
+  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-1.0.4-blue?style=flat" alt="version 1.0.4"></a>
   <a href="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml"><img src="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml/badge.svg" alt="check"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat" alt="MIT"></a>
 </p>

@@ -10,4 +10,5 @@ jobs:
       - run: python3 evals/jm_lint.py --self-test
       - run: python3 src/hooks/test_activate.py
       - run: python3 src/hooks/test_lint_hook.py
+      - run: python3 src/hooks/test_py_sh.py
       - run: python3 evals/check_numbers.py

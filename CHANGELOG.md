@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4, 2026-09-10
+
+- The hooks start through `src/hooks/py.sh`, which probes python3, python,
+  and py -3 and skips the Microsoft Store stub on Windows. With no Python 3
+  it says so once on stderr and exits 0.
+
 ## 1.0.3, 2026-09-10
 
 - The SessionStart hook is Python. The plugin needs python3 only; Node is
