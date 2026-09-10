@@ -108,6 +108,7 @@ def strip_code(text: str) -> str:
     text = re.sub(r"`[^`\n]+`", "X", text)  # one code span counts as one character
     text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
     text = re.sub(r"^#{1,6}\s.*$", " ", text, flags=re.M)  # headings are titles, exempt
+    text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)  # a Markdown link is its text; the target is not prose
     text = re.sub(r"https?://\S+", "U", text)
     text = re.sub(r"^\s*\|[\s:|-]+\|\s*$", " ", text, flags=re.M)  # table separator rows
     text = re.sub(
@@ -281,6 +282,7 @@ def self_test() -> None:
     assert sentences("他说：“重启。”然后继续。") == ["他说：“重启。”", "然后继续。"]
     assert sentences("- 第一项\n- 第二项") == ["第一项。", "第二项。"]
     assert char_count(strip_code("运行 `datasync run` 命令")) == 5
+    assert char_count(strip_code("见 [规则目录](skills/jianming-zhongwen/references/rule-catalog.md)。")) == 5  # link target not counted
     cell = lint(TABLE_FIXTURE, "descriptive")["violations"]
     assert cell["banned_modal"] == 1 and cell["sentence_over_limit"] == 0, cell
     assert lint("一" * 55 + "。", "descriptive")["violations"]["sentence_over_limit"] == 1

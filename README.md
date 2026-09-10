@@ -8,7 +8,7 @@
 
 一个 Agent Skill，让模型用一遍就能读懂的中文写技术文档和回复。规则可数，能用正则查：程序性句子不超过 30 字，情态词只用五组，不用 进行 / 作出 加名词，回复最多 5 句。
 
-规则来自中文自己的规范：余光中对欧化中文的批评，阮一峰的《中文技术文档的写作规范》，GB/T 1.1-2020 附录 C 的能愿动词分工，GB/T 15834-2011 的标点用法。AI 味只是第二层守卫，依据是 lieflat 语料和 CCL 2023 的实测数据。研究过程和每条决定的理由在 [docs/design.md](docs/design.md)。
+规则来自中文自己的规范：余光中对欧化中文的批评，阮一峰的《中文技术文档的写作规范》。情态词的分工来自 GB/T 1.1-2020 附录 C，标点用法来自 GB/T 15834-2011。AI 味只是第二层守卫，依据是 lieflat 语料和 CCL 2023 的实测数据。研究过程和每条决定的理由在 [docs/design.md](docs/design.md)。
 
 工程结构仿照 [AminBlg/SimpleEnglish](https://github.com/AminBlg/SimpleEnglish)：自测、数字门、版本门、hook、marketplace。
 
@@ -31,7 +31,7 @@ Claude Code 插件，带 hook 和输出样式：
 npx skills add heichaowo/jianming-zhongwen
 ```
 
-不支持 SKILL.md 的工具：把 [prompts/system-prompt.md](prompts/system-prompt.md) 里两条分隔线之间的规则块粘贴进系统提示、`AGENTS.md` 或 `.cursorrules`。页尾有一个 60 token 的短版本。
+不支持 SKILL.md 的工具：把规则块粘贴进系统提示、`AGENTS.md` 或 `.cursorrules`。规则块在 [prompts/system-prompt.md](prompts/system-prompt.md) 两条分隔线之间，页尾有一个 60 token 的短版本。
 
 ## 规则
 
@@ -69,7 +69,7 @@ npx skills add heichaowo/jianming-zhongwen
 
 <!-- numbers-from: evals/results/run-2026-09-09 -->
 
-数字来自 `evals/results/run-2026-09-09`，`evals/check_numbers.py` 每次推送都从入库的原始文件重算。生成在 Claude Code 桌面 App 里用 Workflow 工具完成：sonnet，effort low，本插件和 simple-english 都已卸载或禁用，用户自己的 CLAUDE.md 在场。每格一次生成，回复两轮。头条指标是回复的读者可见缺陷，不是 linter 的违规数。
+数字来自 `evals/results/run-2026-09-09`，`evals/check_numbers.py` 每次推送都从入库的原始文件重算。生成在 Claude Code 桌面 App 里用 Workflow 工具完成。模型 sonnet，effort low。本插件和 simple-english 都已卸载或禁用，用户自己的 CLAUDE.md 在场。每格一次生成，回复两轮。头条指标是回复的读者可见缺陷，不是 linter 的违规数。
 
 回复，8 个问题各两轮，共 16 条。可见缺陷（超过 5 句的句子、破折号、加粗、标题、列表项）从 322 降到 2，少 99%。5 句以内的回复 0/16 对 14/16。
 
@@ -92,7 +92,7 @@ python3 evals/jm_lint.py --type reply 回复.txt
 python3 evals/jm_lint.py --self-test
 ```
 
-纯标准库，Python 3.9。它只数正则能数的东西：句长、弱动词、被字句、禁用情态词、分号、破折号、首先其次链、不是而是、的字链、空洞词、同义词轮换。它看不懂意思，一个施事未知的被字句也会被数进去。
+纯标准库，Python 3.9。它只数正则能数的东西：句长、弱动词、被字句、禁用情态词、分号、破折号、首先其次链、不是而是、的字链、空洞词、同义词轮换。它看不懂意思，施事未知的被字句它也照数。
 
 插件里的两个 hook 用它：写完一个 .md 文件后报一次违规摘要，回复超过 5 句或带格式时提醒一次。两个都只提示，不阻塞。设置 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 可以跳过路径，用系统的路径分隔符隔开的 glob 列表。
 
@@ -106,7 +106,7 @@ python3 evals/jm_lint.py --self-test
 
 ## 许可
 
-MIT 许可。GB/T 条文只转述，不复制，附上链接。不含 ASD-STE100 词典内容。
+本项目采用 MIT 许可。GB/T 条文只转述，不复制，附上链接。不含 ASD-STE100 词典内容。
 
 ---
 
@@ -186,4 +186,4 @@ Open an issue for questions and bug reports. Pull requests are welcome. A change
 
 ## License
 
-MIT license. GB/T text is paraphrased, never copied, with links to the source. No ASD-STE100 dictionary content.
+This project is licensed under MIT. GB/T text is paraphrased, never copied, with links to the source. No ASD-STE100 dictionary content.
