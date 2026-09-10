@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3, 2026-09-10
+
+- The SessionStart hook is Python. The plugin needs python3 only; Node is
+  gone from the hooks and from CI. Output is byte-identical to the Node hook.
+
 ## 1.0.2, 2026-09-10
 
 - Chinese only. The rule block and SKILL.md say English text is out of

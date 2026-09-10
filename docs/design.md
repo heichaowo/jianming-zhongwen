@@ -125,7 +125,7 @@ linter `evals/jm_lint.py`：纯标准库，Python 3.9。文档指标：句超限
 
 拒绝本地目录 marketplace。官方文档不允许插件源指向 marketplace 根目录本身，指向仓库的符号链接又会因为在 marketplace 之外被跳过，只能包一层拷贝加同步脚本。2026-09-09 试过一次，能用，但和「从 GitHub 更新测试」重复，删了。
 
-三个 hook：SessionStart 用 Node 把 `prompts/system-prompt.md` 的规则块以纯文本写到 stdout，和 SimpleEnglish 2.0.2 实测一致，不包 JSON；上限 9500 字符，超限或读不到文件时输出一段固定的短规则。PostToolUse 在 Write 和 Edit 一个 .md 文件后跑 linter，退出码 2，只提示不阻塞，跳过 `.claude` 目录和 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 列出的路径。Stop 对最后一条回复跑 reader_check，中文占比不到三成的回复跳过，违规时返回一条 systemMessage，永远退出 0。Python hook 在启动时把 stdout 和 stderr 重设为 UTF-8，不靠 shell 环境变量，Windows 上也能输出中文。
+三个 hook 都是 Python，插件只依赖 python3。SessionStart 把 `prompts/system-prompt.md` 的规则块以纯文本写到 stdout，和 SimpleEnglish 2.0.2 实测一致，不包 JSON；上限 9500 字符，超限或读不到文件时输出一段固定的短规则。PostToolUse 在 Write 和 Edit 一个 .md 文件后跑 linter，退出码 2，只提示不阻塞，跳过 `.claude` 目录和 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 列出的路径。Stop 对最后一条回复跑 reader_check，中文占比不到三成的回复跳过，违规时返回一条 systemMessage，永远退出 0。hook 脚本在启动时把 stdout 和 stderr 重设为 UTF-8，不靠 shell 环境变量，Windows 上也能输出中文。1.0.3 把 SessionStart 从 Node 改成 Python：它只读文件打印，用 Node 是照抄 SimpleEnglish，多一个运行时没有换来任何东西，输出逐字节相同。
 
 输出样式 `output-styles/jianming-zhongwen.md` 的正文和 `prompts/system-prompt.md` 的规则块逐字相同，`check_numbers.py` 校验。选用名是 `jianming-zhongwen:jianming-zhongwen`。
 
@@ -135,7 +135,7 @@ linter `evals/jm_lint.py`：纯标准库，Python 3.9。文档指标：句超限
 
 ### 2.11 CI 与发布
 
-CI 不调用模型。四步：linter 自测、Node hook 测试、Python hook 测试、`check_numbers.py`。Python 固定 3.9，和本机一致。raw 文件为空时 `check_numbers.py` 只校验版本号和规则块同步，并打印「数字校验跳过」。这是引导期的保护，不是长期逻辑。
+CI 不调用模型。四步：linter 自测、SessionStart hook 测试、lint hook 测试、`check_numbers.py`。Python 固定 3.9，和本机一致。raw 文件为空时 `check_numbers.py` 只校验版本号和规则块同步，并打印「数字校验跳过」。这是引导期的保护，不是长期逻辑。
 
 发布：改 SKILL.md 版本号，同步另外三处，写 CHANGELOG（英文），本地跑四步，App 里跑 `/plugin validate .`，提交 `release: vX.Y.Z`，打标签，推送，从 CHANGELOG 建 GitHub Release。改动了任何已发布数字的提交必须带上 raw 文件。
 
@@ -170,11 +170,10 @@ jianming-zhongwen/
 │   ├── reply_scenarios.json       8 个回复场景
 │   └── results/                   raw 文件、manifest 和 RESULTS.md，入库
 ├── src/hooks/
-│   ├── activate.js                SessionStart
-│   ├── activate.test.js
+│   ├── activate.py                SessionStart
+│   ├── test_activate.py
 │   ├── lint_hook.py               PostToolUse 和 Stop
-│   ├── test_lint_hook.py
-│   └── package.json               {"type": "commonjs"}
+│   └── test_lint_hook.py
 ├── .claude-plugin/
 │   ├── plugin.json
 │   └── marketplace.json
@@ -367,7 +366,7 @@ Testing installs from GitHub, the same path users take. The Code tab of the desk
 
 Rejected a local directory marketplace. The official docs do not allow a plugin source that points at the marketplace root itself, and a symlink to the repository is skipped because it resolves outside the marketplace, which leaves a wrapper copy plus a sync script. Tried once on 2026-09-09, it worked, but it duplicates "test updates from GitHub", so it was deleted.
 
-Three hooks. SessionStart runs Node and writes the rule block from `prompts/system-prompt.md` to stdout as plain text, as SimpleEnglish 2.0.2 does in practice, with no JSON wrapper. It is capped at 9500 characters, with a fixed short rule set as fallback when the file is missing or too long. PostToolUse runs the linter after a Write or Edit on a .md file, exits 2, advisory only, and skips `.claude` directories and every path in `JIANMING_ZHONGWEN_LINT_EXCLUDE`. Stop runs reader_check on the last reply, skips a reply under 30% Chinese, returns one systemMessage on a violation, and always exits 0. The Python hook reconfigures stdout and stderr to UTF-8 at startup so Chinese output works on Windows without a shell variable.
+Three hooks, all Python, so the plugin needs python3 only. SessionStart writes the rule block from `prompts/system-prompt.md` to stdout as plain text, as SimpleEnglish 2.0.2 does in practice, with no JSON wrapper. It is capped at 9500 characters, with a fixed short rule set as fallback when the file is missing or too long. PostToolUse runs the linter after a Write or Edit on a .md file, exits 2, advisory only, and skips `.claude` directories and every path in `JIANMING_ZHONGWEN_LINT_EXCLUDE`. Stop runs reader_check on the last reply, skips a reply under 30% Chinese, returns one systemMessage on a violation, and always exits 0. The hook scripts reconfigure stdout and stderr to UTF-8 at startup so Chinese output works on Windows without a shell variable. 1.0.3 moved SessionStart from Node to Python: it only reads a file and prints it, Node was copied from SimpleEnglish, and the second runtime bought nothing. The output is byte-identical.
 
 The body of `output-styles/jianming-zhongwen.md` is byte-identical to the rule block in `prompts/system-prompt.md`. `check_numbers.py` verifies this. The style is selected as `jianming-zhongwen:jianming-zhongwen`.
 
@@ -377,7 +376,7 @@ Compatibility: Claude Code plugin and the skills CLI (`npx skills add heichaowo/
 
 ### 2.11 CI and release
 
-CI calls no model. Four steps: linter self-test, Node hook test, Python hook test, `check_numbers.py`. Python is pinned to 3.9 to match this machine. When there are no raw files, `check_numbers.py` checks only the version strings and the rule-block sync and prints that the number check was skipped. This is a bootstrap guard, not permanent logic.
+CI calls no model. Four steps: linter self-test, SessionStart hook test, lint hook test, `check_numbers.py`. Python is pinned to 3.9 to match this machine. When there are no raw files, `check_numbers.py` checks only the version strings and the rule-block sync and prints that the number check was skipped. This is a bootstrap guard, not permanent logic.
 
 Release: bump the version in SKILL.md, sync the other three places, write the CHANGELOG entry in English, run the four CI steps locally, run `/plugin validate .` in the app, commit `release: vX.Y.Z`, tag, push, create the GitHub release from the CHANGELOG. A commit that moves any published number ships the raw files with it.
 

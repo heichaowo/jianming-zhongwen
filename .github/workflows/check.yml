@@ -5,11 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22 }
       - uses: actions/setup-python@v5
         with: { python-version: "3.9" }
       - run: python3 evals/jm_lint.py --self-test
-      - run: node --test src/hooks/activate.test.js
+      - run: python3 src/hooks/test_activate.py
       - run: python3 src/hooks/test_lint_hook.py
       - run: python3 evals/check_numbers.py

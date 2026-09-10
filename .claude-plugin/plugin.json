@@ -2,7 +2,7 @@
   "name": "jianming-zhongwen",
   "displayName": "简明技术中文",
   "description": "用简明技术中文写作：短句、实义动词、条件在前、情态词按阶梯、一词一义、术语首次出现时定义。回复最多 5 句，只用散文。",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": {
     "name": "heichaowo"
   },
@@ -21,7 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/src/hooks/activate.js\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/src/hooks/activate.py\"",
             "timeout": 5,
             "statusMessage": "加载简明技术中文规则..."
           }

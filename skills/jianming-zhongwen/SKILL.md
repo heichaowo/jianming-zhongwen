@@ -10,7 +10,7 @@ description: |
 license: MIT
 compatibility: claude-code cursor codex gemini-cli opencode
 metadata:
-  version: "1.0.2"
+  version: "1.0.3"
   sources: "余光中《怎样改进英式中文》(1987) / 阮一峰《中文技术文档的写作规范》/ GB/T 1.1-2020 附录 C / GB/T 15834-2011 / lieflat 中文 AI 写作语料"
 ---
 
