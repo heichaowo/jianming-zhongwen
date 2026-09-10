@@ -101,6 +101,8 @@ linter `evals/jm_lint.py`：纯标准库，Python 3.9。文档指标：句超限
 
 拒绝 jieba 进核心：450 毫秒冷启动会拖慢每次 PostToolUse hook，而且没有任何发布数字需要分词。留作以后的 `--segmented` 选项。拒绝 pkuseg、HanLP：要下载模型。
 
+选 Python 写 linter 和 hook，理由是运行时普及度和跟 SimpleEnglish 对齐：python3 在 macOS 装了命令行工具后和主流 Linux 上默认有，node 哪里都不默认有，官方插件的 hook 全用 bash 或 Python。分词不决定语言。两种语言都有零安装方案：Python 把纯 Python 的 jieba 连 5 MB 词典提交进仓库，Node 把 jieba-wasm 的 4 MB .wasm 加胶水 JS 提交进仓库。2026-09-10 本机实测同样三句，两者切分逐字一致，jieba-wasm 加载加切分 184 毫秒，Python jieba 350 毫秒，所以上面 450 毫秒那条理由只对 Python 版成立。
+
 头条数字是回复的读者可见缺陷（超上限句 + 破折号 + 加粗 + 标题 + 列表项，16 条回复合计）的下降百分比，加上 5 句以内的回复数。文档的每千字违规数是次要数字。这个顺序是 WHY-USELESS 的直接结论：只报 linter 违规数，测的是对自家 linter 的服从，不是读者看到什么。
 
 评委：盲测成对比较，两种顺序各判一次取平均，评分标准三条：非母语技术读者能否一遍读懂、指令能否照做、有没有废话和 AI 腔。评委是 Claude 模型，文本也是 Claude 输出，家族偏差可能存在，README 要写明。
@@ -340,6 +342,8 @@ Linter `evals/jm_lint.py`: standard library only, Python 3.9. Document metrics: 
 A weak verb counts only when a verbal noun follows it (处理, 分析, 检查, 配置, 部署, 验证, and so on). 进行中 and 进行到一半 do not count. This trades missed hits such as 进行深度学习 for fewer false positives, because false positives make users turn the hook off.
 
 Rejected jieba in the core: its 450 ms cold start slows every PostToolUse hook, and no published number needs segmentation. It stays a future `--segmented` option. Rejected pkuseg and HanLP: they download models.
+
+Python for the linter and the hooks, chosen for runtime availability and alignment with SimpleEnglish: python3 is present on macOS once the command line tools are installed and on mainstream Linux, node is present nowhere by default, and the official plugins write their hooks in bash or Python. Segmentation does not decide the language. Both have a zero-install path: Python commits the pure-Python jieba with its 5 MB dictionary, Node commits the 4 MB .wasm plus glue JS of jieba-wasm. Measured on this machine on 2026-09-10 with the same three sentences: the two cut identically, jieba-wasm loads and cuts in 184 ms, Python jieba in 350 ms, so the 450 ms reason above holds for the Python build only.
 
 The headline number is the reduction in reader-visible reply defects (sentences over cap + dashes + bold + headers + list items, pooled over 16 replies) plus the count of replies within five sentences. Document violations per 1000 characters is the secondary number. This order is the direct lesson of WHY-USELESS: a linter-violation headline measures obedience to your own linter, not what a reader sees.
 
