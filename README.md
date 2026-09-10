@@ -106,7 +106,7 @@ python3 evals/jm_lint.py --self-test
 
 ## 许可
 
-MIT。GB/T 条文只转述不复制。不含任何 ASD-STE100 词典内容。
+MIT 许可。GB/T 条文只转述，不复制，附上链接。不含 ASD-STE100 词典内容。
 
 ---
 
@@ -186,4 +186,4 @@ Open an issue for questions and bug reports. Pull requests are welcome. A change
 
 ## License
 
-MIT. GB/T text is paraphrased, never copied. No ASD-STE100 dictionary content.
+MIT license. GB/T text is paraphrased, never copied, with links to the source. No ASD-STE100 dictionary content.

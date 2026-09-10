@@ -141,7 +141,7 @@ CI 不调用模型。四步：linter 自测、Node hook 测试、Python hook 测
 
 ### 2.12 版权边界
 
-MIT。GB/T 条文只转述不复制，附上链接。不复制任何 STE 词典内容。引用 lieflat 的倍率时注明其语料不公开、第三方无法核验。规则的来源写在 SKILL.md frontmatter，不在正文里讲故事。README 自己写，不翻译 SimpleEnglish 的。
+MIT 许可。GB/T 条文只转述，不复制，附上链接。不复制任何 STE 词典内容。引用 lieflat 的倍率时注明其语料不公开、第三方无法核验。规则的来源写在 SKILL.md frontmatter，不在正文里讲故事。README 自己写，不翻译 SimpleEnglish 的。
 
 ## 3. 目录
 
@@ -381,7 +381,7 @@ Versions start at 0.1.0. Calibrated caps and published benchmark numbers make 1.
 
 ### 2.12 Copyright boundary
 
-MIT. GB/T text is paraphrased, never copied, with links. No STE dictionary content. When citing lieflat ratios, say that its corpus is not public and third parties cannot verify it. Rule sources go in the SKILL.md frontmatter, not in narrative prose. The README is written from scratch, not translated from SimpleEnglish.
+MIT license. GB/T text is paraphrased, never copied, with links. No STE dictionary content. When citing lieflat ratios, say that its corpus is not public and third parties cannot verify it. Rule sources go in the SKILL.md frontmatter, not in narrative prose. The README is written from scratch, not translated from SimpleEnglish.
 
 ## 3. Layout
 
