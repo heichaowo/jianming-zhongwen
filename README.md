@@ -78,7 +78,7 @@ npx skills add heichaowo/jianming-zhongwen
 | 无 skill | 510 | 13.8 | 16 | 54 | 3 | 109 |
 | skill | 177 | 4.2 | 0 | 0 | 0 | 0 |
 
-文档，8 个场景：每千字违规数 12.94 对 7.36，少 43%。skill 剩下的 5 处都是句子超出上限几个字。
+文档，8 个场景：每千字违规数 12.94 对 7.36，少 43%。skill 剩下的 5 处违规分布在 4 篇文档，都是句子超出上限几个字。
 
 评委盲测（sonnet，两种顺序各一票）：skill 胜 7，平 0，负 9。两种顺序在 8 个场景里有 5 个给出相反结论，评委偏向排在后面的那份。位置偏好盖过了内容差异，这个数字不是结论。下一版改成两种顺序各打分再取平均。
 
@@ -158,7 +158,7 @@ Replies, 8 questions in two runs, 16 in total. Visible defects (sentences over f
 | no skill | 510 | 13.8 | 16 | 54 | 3 | 109 |
 | skill | 177 | 4.2 | 0 | 0 | 0 | 0 |
 
-Documents, 8 scenarios: 12.94 violations per 1000 characters without the skill, 7.36 with it, 43% fewer. The remaining 5 are sentences a few characters over the cap.
+Documents, 8 scenarios: 12.94 violations per 1000 characters without the skill, 7.36 with it, 43% fewer. The remaining 5 violations, in 4 of the documents, are sentences a few characters over the cap.
 
 Blind judge (sonnet, one vote per order): the skill won 7, tied 0, lost 9. The two orders disagreed on 5 of 8 scenarios, and the judge leaned toward whichever text came second. Position bias outweighed the content, so this number is not a conclusion. The next version scores both orders and averages.
 
