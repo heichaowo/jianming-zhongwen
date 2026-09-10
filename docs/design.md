@@ -22,8 +22,6 @@ slug `jianming-zhongwen`，显示名「简明技术中文」，仓库 `heichaowo
 
 拒绝 `shuorenhua`：MrGeDiao/shuorenhua（1491 stars）的 marketplace 名和 plugin 名都是它，1-SKILL 和 tentenco 也用它，社区里「说人话」已经等于「去 AI 味改写」。拒绝 `cste-zh`：RinStel 已占用。拒绝 `simple-chinese`：会被读成「简体中文」。拒绝 `jianming`：GitHub 上有一批以人名命名的同名仓库，搜索时混在一起。
 
-本地目录仍叫 `shuorenhua`。仓库建好后把目录改名为 `jianming-zhongwen`。
-
 ### 2.2 硬规则，不是提示
 
 现有的中文受控写作 skill（Fenng、EsserZ、capric98、bjo4）都拒绝硬句长上限和一刀切禁令。本项目反过来：规则可数，可以用正则查。理由是 SimpleEnglish 自己的审计（WHY-USELESS）：真正改变输出的是 5 条可数的回复规则，53 条软规则反而稀释它们。
@@ -261,8 +259,6 @@ Each entry records the judgment, the rejected options, and why. Nothing that the
 Slug `jianming-zhongwen`, display name 简明技术中文, repository `heichaowo/jianming-zhongwen`. The marketplace, plugin, skill, and output style all use the same slug, as SimpleEnglish does.
 
 Rejected `shuorenhua`: MrGeDiao/shuorenhua (1491 stars) uses it as marketplace and plugin name, 1-SKILL and tentenco use it too, and the community reads 说人话 as "de-AI rewrite". Rejected `cste-zh`: taken by RinStel. Rejected `simple-chinese`: reads as "Simplified Chinese". Rejected `jianming`: GitHub has a set of personal repositories with that given name, and searches mix them together.
-
-The local directory is still `shuorenhua`. Rename it to `jianming-zhongwen` after the repository exists.
 
 ### 2.2 Hard rules, not advice
 
