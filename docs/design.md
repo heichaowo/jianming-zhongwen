@@ -32,6 +32,8 @@ slug `jianming-zhongwen`，显示名「简明技术中文」，仓库 `heichaowo
 
 文档（写或改写的内容）和回复（聊天里打出的内容），各一套规则。回复规则在任何模式下优先。这是中文项目里唯一空着的位置。
 
+两个寄存器都只管中文。英文文本和英文回复交给用户自己装的英文工具，例如 SimpleEnglish。规则块写明英文不适用。Stop hook 跳过中文占比不到三成的回复，阈值和文件段落的过滤一致。
+
 ### 2.4 文档规则（16 条）
 
 1. 先分类。程序性文本用祈使句，一句一个动作，每句不超过 30 字。描述性文本用陈述句，每句不超过 50 字，一段一个主题，一段不超过 6 句。逗号分句不超过 40 字。
@@ -121,7 +123,7 @@ linter `evals/jm_lint.py`：纯标准库，Python 3.9。文档指标：句超限
 
 拒绝本地目录 marketplace。官方文档不允许插件源指向 marketplace 根目录本身，指向仓库的符号链接又会因为在 marketplace 之外被跳过，只能包一层拷贝加同步脚本。2026-09-09 试过一次，能用，但和「从 GitHub 更新测试」重复，删了。
 
-三个 hook：SessionStart 用 Node 把 `prompts/system-prompt.md` 的规则块以纯文本写到 stdout，和 SimpleEnglish 2.0.2 实测一致，不包 JSON；上限 9500 字符，超限或读不到文件时输出一段固定的短规则。PostToolUse 在 Write 和 Edit 一个 .md 文件后跑 linter，退出码 2，只提示不阻塞，跳过 `.claude` 目录和 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 列出的路径。Stop 对最后一条回复跑 reader_check，违规时返回一条 systemMessage，永远退出 0。Python hook 在启动时把 stdout 和 stderr 重设为 UTF-8，不靠 shell 环境变量，Windows 上也能输出中文。
+三个 hook：SessionStart 用 Node 把 `prompts/system-prompt.md` 的规则块以纯文本写到 stdout，和 SimpleEnglish 2.0.2 实测一致，不包 JSON；上限 9500 字符，超限或读不到文件时输出一段固定的短规则。PostToolUse 在 Write 和 Edit 一个 .md 文件后跑 linter，退出码 2，只提示不阻塞，跳过 `.claude` 目录和 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 列出的路径。Stop 对最后一条回复跑 reader_check，中文占比不到三成的回复跳过，违规时返回一条 systemMessage，永远退出 0。Python hook 在启动时把 stdout 和 stderr 重设为 UTF-8，不靠 shell 环境变量，Windows 上也能输出中文。
 
 输出样式 `output-styles/jianming-zhongwen.md` 的正文和 `prompts/system-prompt.md` 的规则块逐字相同，`check_numbers.py` 校验。选用名是 `jianming-zhongwen:jianming-zhongwen`。
 
@@ -270,6 +272,8 @@ The cost: every number in SKILL.md must be validated on a Chinese benchmark firs
 
 The document (what you write or rewrite) and the reply (what you type in chat) each have their own rules. Reply rules apply first in every mode. This is the one position no Chinese project has taken.
 
+Both registers cover Chinese only. English text and English replies go to whatever English tool the user installs, for example SimpleEnglish. The rule block says English is out of scope. The Stop hook skips a reply whose counted characters are under 30% Chinese, the same threshold as the paragraph filter on files.
+
 ### 2.4 Document rules (16)
 
 1. Classify first. Procedural text: imperative, one action per sentence, 30 characters per sentence. Descriptive text: declarative, 50 characters per sentence, one topic per paragraph, six sentences per paragraph. A comma clause has 40 characters at most.
@@ -359,7 +363,7 @@ Testing installs from GitHub, the same path users take. The Code tab of the desk
 
 Rejected a local directory marketplace. The official docs do not allow a plugin source that points at the marketplace root itself, and a symlink to the repository is skipped because it resolves outside the marketplace, which leaves a wrapper copy plus a sync script. Tried once on 2026-09-09, it worked, but it duplicates "test updates from GitHub", so it was deleted.
 
-Three hooks. SessionStart runs Node and writes the rule block from `prompts/system-prompt.md` to stdout as plain text, as SimpleEnglish 2.0.2 does in practice, with no JSON wrapper. It is capped at 9500 characters, with a fixed short rule set as fallback when the file is missing or too long. PostToolUse runs the linter after a Write or Edit on a .md file, exits 2, advisory only, and skips `.claude` directories and every path in `JIANMING_ZHONGWEN_LINT_EXCLUDE`. Stop runs reader_check on the last reply, returns one systemMessage on a violation, and always exits 0. The Python hook reconfigures stdout and stderr to UTF-8 at startup so Chinese output works on Windows without a shell variable.
+Three hooks. SessionStart runs Node and writes the rule block from `prompts/system-prompt.md` to stdout as plain text, as SimpleEnglish 2.0.2 does in practice, with no JSON wrapper. It is capped at 9500 characters, with a fixed short rule set as fallback when the file is missing or too long. PostToolUse runs the linter after a Write or Edit on a .md file, exits 2, advisory only, and skips `.claude` directories and every path in `JIANMING_ZHONGWEN_LINT_EXCLUDE`. Stop runs reader_check on the last reply, skips a reply under 30% Chinese, returns one systemMessage on a violation, and always exits 0. The Python hook reconfigures stdout and stderr to UTF-8 at startup so Chinese output works on Windows without a shell variable.
 
 The body of `output-styles/jianming-zhongwen.md` is byte-identical to the rule block in `prompts/system-prompt.md`. `check_numbers.py` verifies this. The style is selected as `jianming-zhongwen:jianming-zhongwen`.
 

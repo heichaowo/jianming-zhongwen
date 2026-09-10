@@ -7,7 +7,8 @@ the model sees it. Exit 2 on PostToolUse is advisory: the tool already ran.
 Agent-internal Markdown, such as memory files under the Claude configuration
 directory, is skipped. Set JIANMING_ZHONGWEN_LINT_EXCLUDE to skip more paths.
 
-Stop: read `last_assistant_message`, check the reply register (five sentences
+Stop: read `last_assistant_message`, skip it when under 30% of its counted
+characters are Chinese, otherwise check the reply register (five sentences
 or fewer with list items counted, no headers, bullets, bold, or dashes, no
 opener or closer), and return a systemMessage only when the reply breaks it.
 Always exit 0, so the session never loops.
@@ -78,15 +79,16 @@ def excluded(target):
     return False
 
 
+def is_chinese(lint, text):
+    """True when at least 30% of the counted characters are Chinese."""
+    counted = lint.CJK_ALNUM.findall(lint.strip_code(text))
+    cjk = sum(1 for ch in counted if ord(ch) > 0x2E7F)
+    return bool(counted) and cjk >= 0.3 * len(counted)
+
+
 def chinese_paragraphs(lint, text):
     """Keep the paragraphs that are mostly Chinese. A bilingual README keeps its Chinese half."""
-    kept = []
-    for para in re.split(r"\n\s*\n", text):
-        counted = lint.CJK_ALNUM.findall(lint.strip_code(para))
-        cjk = sum(1 for ch in counted if ord(ch) > 0x2E7F)
-        if counted and cjk >= 0.3 * len(counted):
-            kept.append(para)
-    return "\n\n".join(kept)
+    return "\n\n".join(p for p in re.split(r"\n\s*\n", text) if is_chinese(lint, p))
 
 
 def post_tool_use(event):
@@ -121,7 +123,7 @@ def post_tool_use(event):
 def stop(event):
     reply = event.get("last_assistant_message") or ""
     lint = load_linter()
-    if lint is None:
+    if lint is None or not is_chinese(lint, reply):
         return 0
     c = lint.reader_check(reply)["counts"]
     problems = []

@@ -101,6 +101,12 @@ class LintHookTest(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r)
         self.assertEqual(r.stdout, "")
 
+    def test_stop_skips_an_english_reply(self):
+        english = "Sure! Here is the plan:\n\n- **Step one**: check the network.\n- Step two: check the firewall.\n\nThen restart. Retry. Check. Hope this helps!"
+        r = run({"hook_event_name": "Stop", "last_assistant_message": english})
+        self.assertEqual(r.returncode, 0, r)
+        self.assertEqual(r.stdout, "")
+
     def test_garbage_stdin_exits_0(self):
         r = subprocess.run([sys.executable, str(HOOK)], input="not json", capture_output=True, text=True, timeout=30)
         self.assertEqual(r.returncode, 0, r)

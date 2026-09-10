@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2, 2026-09-10
+
+- Chinese only. The rule block and SKILL.md say English text is out of
+  scope, and the Stop hook skips a reply under 30% Chinese, so an English
+  writing tool such as SimpleEnglish can own English replies.
+
 ## 1.0.1, 2026-09-10
 
 - The PostToolUse hook lints the Chinese paragraphs of a bilingual file

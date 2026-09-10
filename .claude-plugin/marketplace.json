@@ -11,7 +11,7 @@
       "source": "./",
       "displayName": "简明技术中文",
       "description": "用简明技术中文写作：短句、实义动词、条件在前、情态词按阶梯、一词一义、术语首次出现时定义。回复最多 5 句，只用散文。",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "author": {
         "name": "heichaowo"
       },
