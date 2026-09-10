@@ -228,7 +228,7 @@ jianming-zhongwen/
 
 回复：可见缺陷 322 降到 2，5 句以内 0/16 对 14/16，平均 510 字降到 177 字，13.8 句降到 4.2 句。破折号、加粗、标题、列表项全部为 0。两条超上限的回复各 6 句。
 
-文档：每千字违规 12.94 对 7.36，少 43%。skill 剩下的 5 处都是句子超上限：architecture 61 字（上限 50），troubleshooting 44 和 33 字、getting-started 37 字、error-message 31 字（上限 30）。模型拿到规则块后仍会超出程序性上限几个字，这条规则的服从度不如格式类规则。
+文档：每千字违规 12.94 对 7.36，少 43%。skill 剩下的 5 处分布在 4 篇文档，都是句子超上限：architecture 61 字（上限 50），troubleshooting 44 和 33 字、getting-started 37 字、error-message 31 字（上限 30）。模型拿到规则块后仍会超出程序性上限几个字，这条规则的服从度不如格式类规则。
 
 评委：两种顺序各一票，skill 胜 7，平 0，负 9。按顺序拆开看，A 是基线时 skill 赢 6/8，A 是 skill 时基线赢 7/8。评委选的是位置 B，不是内容。只有 3 个场景两种顺序一致：缓存失效判 skill，幂等和分库分表判基线。结论：这轮评委设计（只报胜者）测不出内容差异，下一版改成两种顺序各打 0 到 10 分再取平均，与 SimpleEnglish 相同。
 
@@ -426,7 +426,7 @@ Same run, completed: the error-message baseline was rerun in Chinese, the skill 
 
 Replies: visible defects 322 to 2, within five sentences 0 of 16 to 14 of 16, average 510 to 177 characters and 13.8 to 4.2 sentences. Dashes, bold, headers, and list items all at 0. The two replies over the cap have 6 sentences each.
 
-Documents: 12.94 to 7.36 violations per 1000 characters, 43% fewer. The 5 remaining skill violations are all sentences over the cap: architecture 61 (cap 50), troubleshooting 44 and 33, getting-started 37, error-message 31 (cap 30). With the rule block the model still overshoots the procedural cap by a few characters. This rule is obeyed less than the formatting rules.
+Documents: 12.94 to 7.36 violations per 1000 characters, 43% fewer. The 5 remaining skill violations, in 4 of the documents, are all sentences over the cap: architecture 61 (cap 50), troubleshooting 44 and 33, getting-started 37, error-message 31 (cap 30). With the rule block the model still overshoots the procedural cap by a few characters. This rule is obeyed less than the formatting rules.
 
 Judge: one vote per order, skill 7 wins, 0 ties, 9 losses. Split by order: with the baseline as A the skill won 6 of 8; with the skill as A the baseline won 7 of 8. The judge picked position B, not the content. Only 3 scenarios agree across both orders: cache-invalidation for the skill, idempotent and sharding for the baseline. Conclusion: a winner-only judge cannot see the content difference here. The next version scores both orders 0 to 10 and averages, as SimpleEnglish does.
 
