@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1, 2026-09-10
+
+- The PostToolUse hook lints the Chinese paragraphs of a bilingual file
+  instead of skipping the whole file when English letters outnumber Chinese
+  characters.
+
 ## 1.0.0, 2026-09-10
 
 - First measured release, run `evals/results/run-2026-09-09` (sonnet, effort

@@ -18,6 +18,7 @@ import fnmatch
 import json
 import os
 import pathlib
+import re
 import sys
 
 for stream in (sys.stdout, sys.stderr):
@@ -77,6 +78,17 @@ def excluded(target):
     return False
 
 
+def chinese_paragraphs(lint, text):
+    """Keep the paragraphs that are mostly Chinese. A bilingual README keeps its Chinese half."""
+    kept = []
+    for para in re.split(r"\n\s*\n", text):
+        counted = lint.CJK_ALNUM.findall(lint.strip_code(para))
+        cjk = sum(1 for ch in counted if ord(ch) > 0x2E7F)
+        if counted and cjk >= 0.3 * len(counted):
+            kept.append(para)
+    return "\n\n".join(kept)
+
+
 def post_tool_use(event):
     path = (event.get("tool_input") or {}).get("file_path") or ""
     if not path.endswith(".md"):
@@ -91,10 +103,9 @@ def post_tool_use(event):
         text = target.read_text(encoding="utf-8")
     except OSError:
         return 0
-    counted = lint.CJK_ALNUM.findall(lint.strip_code(text))
-    cjk = sum(1 for ch in counted if ord(ch) > 0x2E7F)
-    if not counted or cjk < 0.3 * len(counted):
-        return 0  # an English file, or one with little Chinese: the rules do not apply
+    text = chinese_paragraphs(lint, text)
+    if not text:
+        return 0  # an English file: the rules do not apply
     report = lint.lint(text, "descriptive")
     hits = {k: v for k, v in report["violations"].items() if v}
     if not hits:

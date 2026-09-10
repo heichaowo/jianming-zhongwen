@@ -63,6 +63,12 @@ class LintHookTest(unittest.TestCase):
         r = run(post_event(self.write("CHANGELOG.md", english)))
         self.assertEqual(r.returncode, 0, r)
 
+    def test_bilingual_markdown_lints_the_chinese_half(self):
+        english = "## Install\n\n" + "- Run the installer and then open the settings page to configure the connection string for the database.\n" * 4
+        r = run(post_event(self.write("README.md", SLOP + "\n" + english)))
+        self.assertEqual(r.returncode, 2, r)
+        self.assertIn("弱动词", r.stderr)
+
     def test_non_markdown_is_ignored(self):
         r = run(post_event(self.write("doc.py", SLOP)))
         self.assertEqual(r.returncode, 0, r)
