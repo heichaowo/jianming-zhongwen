@@ -61,7 +61,7 @@ npx skills add heichaowo/jianming-zhongwen
 | 术语第一次出现时用几个字解释 | 读者要去查的词 |
 | 不用开场白和结束语 | 「好的」「希望对你有帮助」 |
 
-完整规则在 [SKILL.md](skills/jianming-zhongwen/SKILL.md)，编号目录和各类文档的结构在 [rule-catalog.md](skills/jianming-zhongwen/references/rule-catalog.md)，替换表在 [word-swaps.md](skills/jianming-zhongwen/references/word-swaps.md)。
+完整规则在 [SKILL.md](skills/jianming-zhongwen/SKILL.md)。编号目录和各类文档的结构在 [rule-catalog.md](skills/jianming-zhongwen/references/rule-catalog.md)，替换表在 [word-swaps.md](skills/jianming-zhongwen/references/word-swaps.md)。
 
 三个字数上限经 2026-09-09 的基线校准，样本是 8 篇文档的 27 个中文句子。校准协议和结果在 [docs/design.md](docs/design.md) 第 2.7 节和第 5 节。
 
