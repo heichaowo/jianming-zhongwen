@@ -1,7 +1,7 @@
 # 简明技术中文 jianming-zhongwen
 
 <p>
-  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-0.1.1-blue?style=flat" alt="version 0.1.1"></a>
+  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-1.0.0-blue?style=flat" alt="version 1.0.0"></a>
   <a href="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml"><img src="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml/badge.svg" alt="check"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat" alt="MIT"></a>
 </p>
@@ -67,7 +67,22 @@ npx skills add heichaowo/jianming-zhongwen
 
 ## 实测
 
-还没有数字。README 里每个数字都必须能由 `evals/check_numbers.py` 从入库的原始文件重算，CI 每次推送都跑。生成在 Claude Code 里用 `/jianming-zhongwen:bench` 完成，打分用 `evals/score_text_dir.py`。头条指标是回复的读者可见缺陷（超过 5 句的句子、破折号、加粗、标题、列表项），不是 linter 的违规数。
+<!-- numbers-from: evals/results/run-2026-09-09 -->
+
+数字来自 `evals/results/run-2026-09-09`，`evals/check_numbers.py` 每次推送都从入库的原始文件重算。生成在 Claude Code 桌面 App 里用 Workflow 工具完成：sonnet，effort low，本插件和 simple-english 都已卸载或禁用，用户自己的 CLAUDE.md 在场。每格一次生成，回复两轮。头条指标是回复的读者可见缺陷，不是 linter 的违规数。
+
+回复，8 个问题各两轮，共 16 条。可见缺陷（超过 5 句的句子、破折号、加粗、标题、列表项）从 322 降到 2，少 99%。5 句以内的回复 0/16 对 14/16。
+
+| 条件 | 字数 | 句数 | 破折号 | 加粗 | 标题 | 列表项 |
+|---|---:|---:|---:|---:|---:|---:|
+| 无 skill | 510 | 13.8 | 16 | 54 | 3 | 109 |
+| skill | 177 | 4.2 | 0 | 0 | 0 | 0 |
+
+文档，8 个场景：每千字违规数 12.94 对 7.36，少 43%。skill 剩下的 5 处都是句子超出上限几个字。
+
+评委盲测（sonnet，两种顺序各一票）：skill 胜 7，平 0，负 9。两种顺序在 8 个场景里有 5 个给出相反结论，评委偏向排在后面的那份。位置偏好盖过了内容差异，这个数字不是结论。下一版改成两种顺序各打分再取平均。
+
+短回复的代价：5 句上限会把「视情况」压成断言。消费积压那题，基线说严重程度取决于吞吐量和业务类型，skill 版直接说「需要立即处理」。规则删掉了铺垫，也删掉了一个正确的保留。
 
 ## linter
 
@@ -134,7 +149,20 @@ The three character caps were calibrated on 2026-09-09 against a baseline of 8 d
 
 ## Measurements
 
-No numbers yet. Every number in this README must be recomputed by `evals/check_numbers.py` from the committed raw files, and CI runs it on every push. Generation happens inside Claude Code with `/jianming-zhongwen:bench`. Scoring uses `evals/score_text_dir.py`. The headline metric is reader-visible reply defects (sentences over the cap, dashes, bold, headers, list items), not linter violations.
+The numbers come from `evals/results/run-2026-09-09`, and `evals/check_numbers.py` recomputes them from the committed raw files on every push. Generation ran inside the Claude Code desktop app with the Workflow tool: sonnet, effort low, this plugin and simple-english removed or disabled, the user's own CLAUDE.md present. One generation per cell, two runs for replies. The headline metric is reader-visible reply defects, not linter violations.
+
+Replies, 8 questions in two runs, 16 in total. Visible defects (sentences over five, dashes, bold, headers, list items) went from 322 to 2, 99% fewer. Replies within five sentences: 0 of 16 without the skill, 14 of 16 with it.
+
+| Condition | chars | sentences | dashes | bold | headers | list items |
+|---|---:|---:|---:|---:|---:|---:|
+| no skill | 510 | 13.8 | 16 | 54 | 3 | 109 |
+| skill | 177 | 4.2 | 0 | 0 | 0 | 0 |
+
+Documents, 8 scenarios: 12.94 violations per 1000 characters without the skill, 7.36 with it, 43% fewer. The remaining 5 are sentences a few characters over the cap.
+
+Blind judge (sonnet, one vote per order): the skill won 7, tied 0, lost 9. The two orders disagreed on 5 of 8 scenarios, and the judge leaned toward whichever text came second. Position bias outweighed the content, so this number is not a conclusion. The next version scores both orders and averages.
+
+The cost of short replies: the five-sentence cap can turn "it depends" into an assertion. On the consumer-lag question the baseline said severity depends on throughput and the business path; the skill version said "handle it now". The rules removed the preamble and also removed a correct hedge.
 
 ## Linter
 

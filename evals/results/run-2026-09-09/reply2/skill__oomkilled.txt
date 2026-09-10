@@ -1,0 +1,1 @@
+Pod 内存请求或限制设置过低，进程用量超过 limit 后被内核 OOM killer 杀掉，Kubernetes 判定为 OOMKilled 并按重启策略拉起，如果内存持续超限就反复重启。先用 `kubectl describe pod <name>` 看 `Last State` 里的 `Reason: OOMKilled` 和退出码 137 确认，再用 `kubectl top pod <name>` 或历史监控看实际内存曲线。如果是应用有内存泄漏，先修代码或加超时重启；如果只是 limit 设得太紧，调高 `resources.limits.memory`，并把 `requests.memory` 设到接近日常用量。改完用 `kubectl apply` 更新后观察一段时间的内存曲线，确认不再逼近新 limit。

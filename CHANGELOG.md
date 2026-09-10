@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.0, 2026-09-10
+
+- First measured release, run `evals/results/run-2026-09-09` (sonnet, effort
+  low, generated inside Claude Code). Replies: reader-visible defects 322 to 2
+  over 16 replies, 14 of 16 within five sentences. Documents: 12.94 to 7.36
+  violations per 1000 characters. Blind judge with one vote per order: 7 wins,
+  0 ties, 9 losses, and the two orders disagree on 5 of 8 scenarios, so the
+  judge shows position bias, not a verdict.
+- Known cost: the five-sentence cap can turn "it depends" into an assertion
+  (the consumer-lag scenario).
+
 ## 0.1.1, 2026-09-09
 
 - Calibrated the sentence caps on the first baseline run (8 documents, 27

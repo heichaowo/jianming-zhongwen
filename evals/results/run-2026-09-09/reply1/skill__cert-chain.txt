@@ -1,0 +1,1 @@
+这是本地信任链缺失，curl 找不到根证书。先确认系统证书是否完整：`curl --cacert /etc/ssl/certs/ca-certificates.crt https://内部域名`，能通就是 curl 默认路径没找对证书。如果公司用了自签名或内部 CA，把该 CA 证书导入系统信任库，例如 Debian/Ubuntu 执行 `update-ca-certificates`，CentOS 执行 `update-ca-trust`。不要用 `-k` 跳过校验，这会关闭证书验证，存在中间人风险。如果是 Python requests 或 Node 报同类错误，需要额外设置 `REQUESTS_CA_BUNDLE` 或 `NODE_EXTRA_CA_CERTS` 指向该 CA 文件。

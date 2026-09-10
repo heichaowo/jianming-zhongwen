@@ -199,7 +199,7 @@ jianming-zhongwen/
 - [x] 3 插件（2026-09-09，App 内验证：新会话有规则注入，Stop hook 提示）
 - [x] 4 benchmark 脚本（2026-09-09）
 - [x] 5 CI 与 v0.1.0（2026-09-09，Actions 全绿，从 GitHub 安装验证通过）
-- [ ] 6 校准与 v1.0.0：基线已跑，上限已校准（v0.1.1），skill 条件和评委待跑
+- [x] 6 校准与 v1.0.0（2026-09-10）
 
 ## 5. 测量
 
@@ -221,6 +221,20 @@ jianming-zhongwen/
 回复基线 16 条：平均 510 字，13.8 句，0 条在 5 句以内，破折号 16，加粗 54，标题 3，列表项 109，可见缺陷合计 322。开场白和结束语都是 0，这个模型在 low effort 下直接给答案。
 
 文档基线 7 篇中文加 1 篇英文：描述性上限 45 时每千字违规 13.70，改为 50 后 12.72。发布的数字以当时的 linter 重算为准。
+
+### 5.2 skill 条件与评委，2026-09-10
+
+同一批次补跑：报错文本场景的基线改为中文后重跑，skill 条件跑了 8 篇文档和两轮回复，评委跑了 8 个回复场景。规则块是 v0.1.1 的，SHA256 在 manifest 里。
+
+回复：可见缺陷 322 降到 2，5 句以内 0/16 对 14/16，平均 510 字降到 177 字，13.8 句降到 4.2 句。破折号、加粗、标题、列表项全部为 0。两条超上限的回复各 6 句。
+
+文档：每千字违规 12.94 对 7.36，少 43%。skill 剩下的 5 处都是句子超上限：architecture 61 字（上限 50），troubleshooting 44 和 33 字、getting-started 37 字、error-message 31 字（上限 30）。模型拿到规则块后仍会超出程序性上限几个字，这条规则的服从度不如格式类规则。
+
+评委：两种顺序各一票，skill 胜 7，平 0，负 9。按顺序拆开看，A 是基线时 skill 赢 6/8，A 是 skill 时基线赢 7/8。评委选的是位置 B，不是内容。只有 3 个场景两种顺序一致：缓存失效判 skill，幂等和分库分表判基线。结论：这轮评委设计（只报胜者）测不出内容差异，下一版改成两种顺序各打 0 到 10 分再取平均，与 SimpleEnglish 相同。
+
+内容代价：消费积压那题，基线正确地说严重程度取决于吞吐量和业务类型，skill 版说「问题较严重，需要立即处理」。5 句上限压掉了一个正确的保留。规则 10「只说事实」和规则 2「不补原文没有的结论」本应挡住这句，但没挡住。要么在回复规则里加一句「不确定的事说不确定」，要么接受这是上限的代价并写进 README。这版选择写进 README，下一版再测加规则的效果。
+
+校准复核：报错文本基线改为中文后，程序性 15 句，P70 是 30，描述性不变。上限维持 30 / 50 / 40。
 
 ---
 
@@ -405,3 +419,17 @@ The sample is small. Among the 14 descriptive sentences nothing falls between 32
 Reply baseline, 16 replies: 510 characters and 13.8 sentences on average, 0 within five sentences, 16 dashes, 54 bold spans, 3 headers, 109 list items, 322 visible defects in total. Openers and closers are both 0; this model at low effort starts with the answer.
 
 Document baseline, 7 Chinese documents plus 1 English: 13.70 violations per 1000 characters with the descriptive cap at 45, 12.72 with the cap at 50. Published numbers are whatever the linter of the day recomputes.
+
+### 5.2 Skill condition and judge, 2026-09-10
+
+Same run, completed: the error-message baseline was rerun in Chinese, the skill condition ran for 8 documents and two reply runs, the judge ran for the 8 reply scenarios. The rule block is v0.1.1's; its SHA256 is in the manifest.
+
+Replies: visible defects 322 to 2, within five sentences 0 of 16 to 14 of 16, average 510 to 177 characters and 13.8 to 4.2 sentences. Dashes, bold, headers, and list items all at 0. The two replies over the cap have 6 sentences each.
+
+Documents: 12.94 to 7.36 violations per 1000 characters, 43% fewer. The 5 remaining skill violations are all sentences over the cap: architecture 61 (cap 50), troubleshooting 44 and 33, getting-started 37, error-message 31 (cap 30). With the rule block the model still overshoots the procedural cap by a few characters. This rule is obeyed less than the formatting rules.
+
+Judge: one vote per order, skill 7 wins, 0 ties, 9 losses. Split by order: with the baseline as A the skill won 6 of 8; with the skill as A the baseline won 7 of 8. The judge picked position B, not the content. Only 3 scenarios agree across both orders: cache-invalidation for the skill, idempotent and sharding for the baseline. Conclusion: a winner-only judge cannot see the content difference here. The next version scores both orders 0 to 10 and averages, as SimpleEnglish does.
+
+Content cost: on the consumer-lag question the baseline correctly said severity depends on throughput and the business path; the skill version said "the problem is serious, handle it now". The five-sentence cap squeezed out a correct hedge. Rule 10 (state the fact) and rule 2 (do not add conclusions the source did not give) were meant to block that sentence and did not. Either the reply rules gain a line "say what is uncertain", or this is accepted as the cost of the cap and stated in the README. This version states it in the README; the next version measures the added rule.
+
+Calibration recheck: with the error-message baseline in Chinese, procedural has 15 sentences and P70 30; descriptive is unchanged. The caps stay at 30 / 50 / 40.

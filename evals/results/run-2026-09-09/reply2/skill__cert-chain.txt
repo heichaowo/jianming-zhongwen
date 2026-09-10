@@ -1,0 +1,1 @@
+这是本地信任链缺证书，curl 找不到给内部 API 证书签名的根证书或中间证书。先用 `curl -v https://api.internal.example` 看错误出在哪一环。如果是公司自签证书或内部 CA，找运维要 CA 证书文件，加到系统信任库（Linux 用 `update-ca-certificates`，macOS 用钥匙串），或者用 `curl --cacert ca.pem` 指定证书。不要用 `-k` 跳过校验，内部 API 也可能被中间人攻击。如果证书是公开 CA 签发的，多半是系统 CA 包过期，升级 `ca-certificates` 包。

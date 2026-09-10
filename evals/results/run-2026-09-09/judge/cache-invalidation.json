@@ -1,0 +1,13 @@
+{
+  "id": "cache-invalidation",
+  "order1": {
+    "A": "baseline",
+    "B": "skill",
+    "winner": "B"
+  },
+  "order2": {
+    "A": "skill",
+    "B": "baseline",
+    "winner": "A"
+  }
+}

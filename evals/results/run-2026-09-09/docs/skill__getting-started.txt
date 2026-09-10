@@ -1,0 +1,1 @@
+安装执行 `curl -sSL https://get.datasync.dev/install.sh | sh`。编辑 datasync.yaml，填写 MySQL 地址和 OSS 的 AccessKey。运行 `datasync run --config datasync.yaml`，完成第一次同步。

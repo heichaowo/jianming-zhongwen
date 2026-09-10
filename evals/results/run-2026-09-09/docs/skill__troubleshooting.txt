@@ -1,0 +1,5 @@
+故障排查
+
+连接 MySQL 超时，先检查网络和端口，确认目标库地址和端口可达。测试用 `telnet <host> <port>` 或 `nc -zv <host> <port>`。不通，检查安全组和防火墙规则，确认放行来源 IP。能连通但仍超时，检查数据库最大连接数，确认未达上限。
+
+OSS 返回 `AccessDenied`，检查 AccessKey 是否有对应 bucket 的读写权限。检查 bucket 策略和 RAM 权限绑定。确认 endpoint 和 region 与 bucket 实际所在区域一致，跨区域调用会导致鉴权失败。

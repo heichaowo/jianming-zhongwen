@@ -1,0 +1,3 @@
+OSS 上传失败：RAM 账号缺少 oss:PutObject 权限。
+请在 RAM 控制台为该账号授予 oss:PutObject 权限后重试。
+命令：datasync sync --retry

@@ -2,8 +2,11 @@
   "model": "sonnet",
   "effort": "low",
   "date": "2026-09-09",
-  "rule_block_sha256": "ded6ea81ff9be033954a00d4f5c2553b9854dfe226ac9b011a60388c835ae578",
+  "rule_block_sha256": "fe56b4e23c72a97285da081c07324152a3db5fa77fc3d2acd62491323527c511",
   "harness": "claude-code-workflow-tool",
-  "plugins_disabled": ["jianming-zhongwen（已卸载）", "simple-english"],
+  "plugins_disabled": [
+    "jianming-zhongwen（已卸载）",
+    "simple-english"
+  ],
   "user_claude_md": "present"
 }

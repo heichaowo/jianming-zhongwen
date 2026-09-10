@@ -1,0 +1,5 @@
+Pod 内存超过 limit，内核杀掉进程，容器重启。常见原因有内存泄漏、limit 设得太低、并发请求量突增导致瞬时占用超标。
+
+先看命令：`kubectl describe pod <name>` 里的 `Last State: Terminated, Reason: OOMKilled`，再对比 `resources.limits.memory` 和实际用量（`kubectl top pod`）。
+
+如果 limit 明显低于正常用量，调高 `resources.limits.memory`。如果用量持续增长不回落，是内存泄漏，需要走应用代码排查，不是调参数能解决的。

@@ -1,0 +1,13 @@
+{
+  "id": "idempotent",
+  "order1": {
+    "A": "baseline",
+    "B": "skill",
+    "winner": "A"
+  },
+  "order2": {
+    "A": "skill",
+    "B": "baseline",
+    "winner": "B"
+  }
+}
