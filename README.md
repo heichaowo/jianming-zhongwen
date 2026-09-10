@@ -104,9 +104,9 @@ python3 evals/jm_lint.py --self-test
 
 开 issue 提问题和报错。欢迎 PR。改动了任何已发布数字的 PR 要带上原始文件，`python3 evals/check_numbers.py` 必须通过。推送前跑 `python3 evals/jm_lint.py --self-test`。
 
-## 许可
+## 许可证
 
-本项目采用 MIT 许可。GB/T 条文只转述，不复制，附上链接。不含 ASD-STE100 词典内容。
+本项目基于 [MIT](LICENSE) 协议开源。GB/T 条文只转述，不复制，附上链接。不含 ASD-STE100 词典内容。
 
 ---
 
@@ -186,4 +186,4 @@ Open an issue for questions and bug reports. Pull requests are welcome. A change
 
 ## License
 
-This project is licensed under MIT. GB/T text is paraphrased, never copied, with links to the source. No ASD-STE100 dictionary content.
+This project is released under the [MIT](LICENSE) license. GB/T text is paraphrased, never copied, with links to the source. No ASD-STE100 dictionary content.
