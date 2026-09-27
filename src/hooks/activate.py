@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""SessionStart hook: write the rule block from prompts/system-prompt.md to stdout as plain text.
+"""SessionStart hook: write the document rules from prompts/system-prompt.md to stdout as plain text.
+
+The reply register (the paragraphs that start with 回复（) is left out: it applies
+only through the jianming-zhongwen output style or the skill.
 
 Claude Code caps hook stdout at about 10,000 characters. Above that the output
 is written to a file and replaced by a preview, which defeats the hook, so the
@@ -20,13 +23,14 @@ MAX_CHARS = 9500
 
 FALLBACK_CONTEXT = """简明技术中文规则已自动加载
 
-技术写作按简明技术中文的规则：短句，实义动词，条件在前，情态词只用 必须 / 建议 / 可以 / 能 / 可能，一词一义，不动代码、命令和报错原文。回复只用散文，最多 5 句，第一句给答案，不用破折号。"""
+技术写作按简明技术中文的规则：短句，实义动词，条件在前，情态词只用 必须 / 建议 / 可以 / 能 / 可能，一词一义，不动代码、命令和报错原文。"""
 
 HEADER = "\n".join(
     [
         "简明技术中文规则已自动加载",
         "",
-        "不用等用户点名，直接按下面的规则写。完整规则和检查模式在本插件的 skills/jianming-zhongwen/SKILL.md，做检查时读它。",
+        "不用等用户点名，写文档时直接按下面的规则写。完整规则和检查模式在本插件的 skills/jianming-zhongwen/SKILL.md，做检查时读它。",
+        "下面只有文档规则。回复规则只在选了输出样式 jianming-zhongwen 或点名这个 skill 时生效，平时的回复不受它约束。",
         "",
     ]
 )
@@ -68,10 +72,15 @@ def rule_block(content):
     return content[start:end]
 
 
+def document_rules(block):
+    """Drop the reply register: it applies only through the output style or the skill."""
+    return "\n\n".join(p for p in block.strip().split("\n\n") if not p.startswith("回复（"))
+
+
 def build_context(prompt_text):
     if not prompt_text:
         return FALLBACK_CONTEXT
-    out = HEADER + rule_block(strip_frontmatter(prompt_text)).strip()
+    out = HEADER + document_rules(rule_block(strip_frontmatter(prompt_text)))
     if len(out) > MAX_CHARS:
         print(
             f"jianming-zhongwen hook: payload is {len(out)} characters, over the {MAX_CHARS} cap; sending the fallback rules",

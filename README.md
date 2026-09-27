@@ -1,7 +1,7 @@
 # 简明技术中文 jianming-zhongwen
 
 <p>
-  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-1.0.4-blue?style=flat" alt="version 1.0.4"></a>
+  <a href="skills/jianming-zhongwen/SKILL.md"><img src="https://img.shields.io/badge/version-1.1.0-blue?style=flat" alt="version 1.1.0"></a>
   <a href="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml"><img src="https://github.com/heichaowo/jianming-zhongwen/actions/workflows/check.yml/badge.svg" alt="check"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat" alt="MIT"></a>
 </p>
@@ -23,7 +23,7 @@ Claude Code 插件，带 hook 和输出样式：
 
 更新：`/plugin` 界面里点更新，或者 `claude plugin update jianming-zhongwen@jianming-zhongwen`。
 
-输出样式的名字是 `jianming-zhongwen:jianming-zhongwen`，在 `/config` 的 Output style 里选。
+输出样式的名字是 `jianming-zhongwen:jianming-zhongwen`，在 `/config` 的 Output style 里选。装好后每个会话自动注入文档规则。回复规则只在选了这个输出样式或点名 skill 时生效。
 
 任何支持 SKILL.md 的工具：
 
@@ -50,7 +50,7 @@ npx skills add heichaowo/jianming-zhongwen
 | 「的」字链不超过两层，名词化改回动词 | 「服务器端的连接池的超时时间的默认值」「可读性高」 |
 | 格式为读者服务 | 加粗导语、emoji、两句话的标题、两项的列表 |
 
-回复，每一条中文回复：
+回复，选了输出样式 jianming-zhongwen 或点名 skill 之后的每一条中文回复：
 
 | 规则 | 它删掉什么 |
 |---|---|
@@ -94,7 +94,7 @@ python3 evals/jm_lint.py --self-test
 
 纯标准库，Python 3.9。它只数正则能数的东西：句长、弱动词、被字句、禁用情态词、分号、破折号、首先其次链、不是而是、的字链、空洞词、同义词轮换。它看不懂意思，施事未知的被字句它也照数。
 
-插件里的两个 hook 用它：写完一个 .md 文件后报一次违规摘要，中文回复超过 5 句或带格式时提醒一次。英文回复不检查。两个都只提示，不阻塞。设置 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 可以跳过路径，用系统的路径分隔符隔开的 glob 列表。
+插件里的两个 hook 用它：写完一个 .md 文件后报一次违规摘要。选了输出样式后，中文回复超过 5 句或带格式时提醒一次。英文回复不检查。两个都只提示，不阻塞。设置 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 可以跳过路径，用系统的路径分隔符隔开的 glob 列表。
 
 ## 它不做什么
 
@@ -129,7 +129,7 @@ Claude Code plugin, with hooks and an output style:
 
 Update from the `/plugin` screen, or with `claude plugin update jianming-zhongwen@jianming-zhongwen`.
 
-The output style is named `jianming-zhongwen:jianming-zhongwen`. Select it under Output style in `/config`.
+The output style is named `jianming-zhongwen:jianming-zhongwen`. Select it under Output style in `/config`. Once installed, every session gets the document rules injected. The reply rules apply only when this output style is selected or the skill is invoked.
 
 Any tool that reads SKILL.md:
 
@@ -141,7 +141,7 @@ Tools without SKILL.md support: paste the rule block between the two separators 
 
 ## Rules
 
-The document register covers README files, runbooks, troubleshooting, error text, release notes, and incident reports. The reply register covers every Chinese reply: prose only, five sentences at most with list items counted, the answer in the first sentence, no dashes, terms explained at first use, no openers or closers.
+The document register covers README files, runbooks, troubleshooting, error text, release notes, and incident reports. The reply register covers every Chinese reply once the jianming-zhongwen output style is selected or the skill is invoked: prose only, five sentences at most with list items counted, the answer in the first sentence, no dashes, terms explained at first use, no openers or closers.
 
 The full rules are in [SKILL.md](skills/jianming-zhongwen/SKILL.md). The numbered catalog with the structure of each document type is in [rule-catalog.md](skills/jianming-zhongwen/references/rule-catalog.md). The swap table is in [word-swaps.md](skills/jianming-zhongwen/references/word-swaps.md).
 
@@ -174,7 +174,7 @@ python3 evals/jm_lint.py --self-test
 
 Standard library only, Python 3.9. It counts only what a regex can count: sentence length, weak verbs, marked passives, banned modals, semicolons, dashes, ordinal chains, "不是 X 而是 Y", 的 chains, slop words, synonym rotation. It cannot see meaning. A 被 passive with an unknown agent is counted too.
 
-The two plugin hooks use it: a violation summary after each .md file is written, and one reminder when a Chinese reply is over five sentences or carries formatting. English replies are not checked. Both are advisory. Set `JIANMING_ZHONGWEN_LINT_EXCLUDE` to skip paths, a glob list separated by the platform path separator.
+The two plugin hooks use it: a violation summary after each .md file is written, and, with the output style selected, one reminder when a Chinese reply is over five sentences or carries formatting. English replies are not checked. Both are advisory. Set `JIANMING_ZHONGWEN_LINT_EXCLUDE` to skip paths, a glob list separated by the platform path separator.
 
 ## What it does not do
 

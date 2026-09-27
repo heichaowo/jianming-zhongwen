@@ -7,7 +7,9 @@ the model sees it. Exit 2 on PostToolUse is advisory: the tool already ran.
 Agent-internal Markdown, such as memory files under the Claude configuration
 directory, is skipped. Set JIANMING_ZHONGWEN_LINT_EXCLUDE to skip more paths.
 
-Stop: read `last_assistant_message`, skip it when under 30% of its counted
+Stop: only when the effective output style is jianming-zhongwen (settings.local.json,
+then the project settings.json, then the user settings.json, first one that sets it
+wins). Read `last_assistant_message`, skip it when under 30% of its counted
 characters are Chinese, otherwise check the reply register (five sentences
 or fewer with list items counted, no headers, bullets, bold, or dashes, no
 opener or closer), and return a systemMessage only when the reply breaks it.
@@ -31,6 +33,7 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(ROOT / "evals"))
 
 CLAUDE_DIR = ".claude"
+STYLE = "jianming-zhongwen"
 EXCLUDE_VAR = "JIANMING_ZHONGWEN_LINT_EXCLUDE"
 LABELS = {
     "sentence_over_limit": "句子超长",
@@ -120,7 +123,23 @@ def post_tool_use(event):
     return 2
 
 
+def reply_register_active(event):
+    """True when the effective output style is jianming-zhongwen. Local, project, then user settings."""
+    cwd = pathlib.Path(event.get("cwd") or ".")
+    user_dir = absolute(os.environ.get("CLAUDE_CONFIG_DIR") or f"~/{CLAUDE_DIR}")
+    for path in (cwd / CLAUDE_DIR / "settings.local.json", cwd / CLAUDE_DIR / "settings.json", user_dir / "settings.json"):
+        try:
+            style = json.loads(path.read_text(encoding="utf-8")).get("outputStyle")
+        except (OSError, ValueError, AttributeError):
+            continue
+        if style is not None:
+            return style in (STYLE, f"{STYLE}:{STYLE}")
+    return False
+
+
 def stop(event):
+    if not reply_register_active(event):
+        return 0
     reply = event.get("last_assistant_message") or ""
     lint = load_linter()
     if lint is None or not is_chinese(lint, reply):

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0, 2026-09-28
+
+- The reply register is opt-in. SessionStart injects the document rules only;
+  the reply rules apply through the jianming-zhongwen output style or the
+  skill, and the Stop hook checks only when that output style is the effective
+  one (settings.local.json, project settings.json, user settings.json).
+  Reason: 326 Stop reminders in 12 coding sessions in 18 days.
+
 ## 1.0.4, 2026-09-10
 
 - The hooks start through `src/hooks/py.sh`, which probes python3, python,

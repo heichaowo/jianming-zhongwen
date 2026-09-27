@@ -30,10 +30,15 @@ class ActivateTest(unittest.TestCase):
         text = activate.read_first_file(activate.prompt_candidates(None))
         self.assertTrue(text, "prompts/system-prompt.md not found")
         out = activate.build_context(text)
-        for phrase in ("最多 5 句", "必须", "不超过 30 字"):
+        for phrase in ("必须", "不超过 30 字", "只管中文"):
             self.assertIn(phrase, out)
+        self.assertNotIn("最多 5 句", out, "the reply register must stay out of the payload")
         self.assertNotIn("短版本", out, "the short variant must stay out of the payload")
         self.assertLessEqual(len(out), activate.MAX_CHARS)
+
+    def test_document_rules_drops_the_reply_paragraphs(self):
+        block = "文档：甲。\n\n回复（每一条中文回复）：乙。\n\n"
+        self.assertEqual(activate.document_rules(block), "文档：甲。")
 
     def test_an_empty_prompt_file_gives_the_fallback(self):
         self.assertEqual(activate.build_context(""), activate.FALLBACK_CONTEXT)
@@ -52,7 +57,8 @@ class ActivateTest(unittest.TestCase):
         out = r.stdout.decode("utf-8")
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertTrue(out.startswith(activate.HEADER))
-        self.assertIn("最多 5 句", out)
+        self.assertIn("不超过 30 字", out)
+        self.assertNotIn("最多 5 句", out)
 
 
 if __name__ == "__main__":

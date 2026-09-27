@@ -44,7 +44,7 @@ class PyShimTest(unittest.TestCase):
         self.fake("python", f'exec "{sys.executable}" "$@"')
         r = run(self.bin)
         self.assertEqual(r.returncode, 0, r.stderr)
-        self.assertIn("最多 5 句".encode("utf-8"), r.stdout)
+        self.assertIn("不超过 30 字".encode("utf-8"), r.stdout)
 
     def test_no_interpreter_exits_0_with_one_line_on_stderr(self):
         self.fake("python3", "exit 49")

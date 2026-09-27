@@ -30,7 +30,9 @@ slug `jianming-zhongwen`，显示名「简明技术中文」，仓库 `heichaowo
 
 ### 2.3 两个寄存器
 
-文档（写或改写的内容）和回复（聊天里打出的内容），各一套规则。回复规则在任何模式下优先。这是中文项目里唯一空着的位置。
+文档（写或改写的内容）和回复（聊天里打出的内容），各一套规则。回复寄存器是中文项目里唯一空着的位置。
+
+回复寄存器按需生效，不自动注入。它只在两种情况下生效：选了输出样式 jianming-zhongwen，或者点名了 skill。SessionStart 只注入文档规则，去掉规则块里「回复（」开头的段落。Stop hook 只在有效设置的 outputStyle 是 jianming-zhongwen 时检查，设置按 settings.local.json、项目 settings.json、用户 settings.json 的顺序找，先写了的算。点名 skill 的会话靠模型自己遵守，hook 不检查。1.0.x 把回复规则注入每个会话：2026-09-10 到 09-28，Stop hook 在 12 个开发会话里提示了 326 次，236 次是超过 5 句，220 次是加粗。这套规则是为问答回复和 benchmark 定的，放进写代码的会话就在和正常排版打架。全局输出样式 simple-english 还写着「超过两项用列表」，两套规则同时在场，模型只能二选一。2026-09-28 改成按需生效，1.1.0。
 
 两个寄存器都只管中文。英文文本和英文回复交给用户自己装的英文工具，例如 SimpleEnglish。规则块写明英文不适用。Stop hook 跳过中文占比不到三成的回复，阈值和文件段落的过滤一致。
 
@@ -121,11 +123,11 @@ linter `evals/jm_lint.py`：纯标准库，Python 3.9。文档指标：句超限
 
 一个仓库同时是 marketplace 和 plugin，`marketplace.json` 的 `source` 是 `./`。安装两条命令，更新一条：`claude plugin update jianming-zhongwen@jianming-zhongwen`，App 里用 `/plugin` 界面。更新由 `plugin.json` 的 `version` 驱动，版本号不动的 commit 用户拿不到，所以发布流程把版本号提升当作硬步骤。
 
-测试从 GitHub 安装，和用户的路径一样。桌面 App 的 Code 页没有 `/plugin` 命令，用 App 自带的 Claude Code 内核：`~/Library/Application Support/Claude/claude-code/<版本>/claude.app/Contents/MacOS/claude`，它写的是 App 读的同一份登记表 `~/.claude/plugins/`。命令：`plugin marketplace add heichaowo/jianming-zhongwen`，`plugin install jianming-zhongwen@jianming-zhongwen`；推送改动后 `plugin marketplace update jianming-zhongwen`，再 `plugin update jianming-zhongwen@jianming-zhongwen`。`plugin update` 只认版本号，测试中的改动也要提版本号，或者卸载重装。验证：开新会话看规则块有没有注入，写一条超过 5 句的回复看 Stop hook 有没有提示。
+测试从 GitHub 安装，和用户的路径一样。桌面 App 的 Code 页没有 `/plugin` 命令，用 App 自带的 Claude Code 内核：`~/Library/Application Support/Claude/claude-code/<版本>/claude.app/Contents/MacOS/claude`，它写的是 App 读的同一份登记表 `~/.claude/plugins/`。命令：`plugin marketplace add heichaowo/jianming-zhongwen`，`plugin install jianming-zhongwen@jianming-zhongwen`；推送改动后 `plugin marketplace update jianming-zhongwen`，再 `plugin update jianming-zhongwen@jianming-zhongwen`。`plugin update` 只认版本号，测试中的改动也要提版本号，或者卸载重装。验证：开新会话看文档规则有没有注入。选上输出样式后写一条超过 5 句的回复，看 Stop hook 有没有提示。
 
 拒绝本地目录 marketplace。官方文档不允许插件源指向 marketplace 根目录本身，指向仓库的符号链接又会因为在 marketplace 之外被跳过，只能包一层拷贝加同步脚本。2026-09-09 试过一次，能用，但和「从 GitHub 更新测试」重复，删了。
 
-三个 hook 都是 Python，插件只依赖 python3。三个都经 `src/hooks/py.sh` 启动：它按 python3、python、py -3 的顺序探测，跳过 Windows 商店的 python3 占位程序，和官方 security-guidance 插件的垫片顺序一致。一个都没有时在 stderr 说一句并退出 0，因为 hook 只提示，不能因为没装 Python 弄坏会话。SessionStart 把 `prompts/system-prompt.md` 的规则块以纯文本写到 stdout，和 SimpleEnglish 2.0.2 实测一致，不包 JSON；上限 9500 字符，超限或读不到文件时输出一段固定的短规则。PostToolUse 在 Write 和 Edit 一个 .md 文件后跑 linter，退出码 2，只提示不阻塞，跳过 `.claude` 目录和 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 列出的路径。Stop 对最后一条回复跑 reader_check，中文占比不到三成的回复跳过，违规时返回一条 systemMessage，永远退出 0。hook 脚本在启动时把 stdout 和 stderr 重设为 UTF-8，不靠 shell 环境变量，Windows 上也能输出中文。1.0.3 把 SessionStart 从 Node 改成 Python：它只读文件打印，用 Node 是照抄 SimpleEnglish，多一个运行时没有换来任何东西，输出逐字节相同。
+三个 hook 都是 Python，插件只依赖 python3。三个都经 `src/hooks/py.sh` 启动：它按 python3、python、py -3 的顺序探测，跳过 Windows 商店的 python3 占位程序，和官方 security-guidance 插件的垫片顺序一致。一个都没有时在 stderr 说一句并退出 0，因为 hook 只提示，不能因为没装 Python 弄坏会话。SessionStart 把 `prompts/system-prompt.md` 规则块里的文档规则以纯文本写到 stdout，和 SimpleEnglish 2.0.2 实测一致，不包 JSON；上限 9500 字符，超限或读不到文件时输出一段固定的短规则。PostToolUse 在 Write 和 Edit 一个 .md 文件后跑 linter，退出码 2，只提示不阻塞，跳过 `.claude` 目录和 `JIANMING_ZHONGWEN_LINT_EXCLUDE` 列出的路径。Stop 只在有效设置的 outputStyle 是 jianming-zhongwen 时对最后一条回复跑 reader_check，中文占比不到三成的回复跳过，违规时返回一条 systemMessage，永远退出 0。hook 脚本在启动时把 stdout 和 stderr 重设为 UTF-8，不靠 shell 环境变量，Windows 上也能输出中文。1.0.3 把 SessionStart 从 Node 改成 Python：它只读文件打印，用 Node 是照抄 SimpleEnglish，多一个运行时没有换来任何东西，输出逐字节相同。
 
 输出样式 `output-styles/jianming-zhongwen.md` 的正文和 `prompts/system-prompt.md` 的规则块逐字相同，`check_numbers.py` 校验。选用名是 `jianming-zhongwen:jianming-zhongwen`。
 
@@ -160,7 +162,7 @@ jianming-zhongwen/
 │       ├── word-swaps.md          欧化和黑话到简明写法的对照表
 │       └── slop-zh.tsv            词、来源、替换建议；linter 读取
 ├── commands/bench.md              /jianming-zhongwen:bench，在 App 里生成 raw 文件
-├── prompts/system-prompt.md       独立规则块，hook 注入，无 SKILL.md 支持时粘贴
+├── prompts/system-prompt.md       独立规则块，hook 注入其中的文档规则，无 SKILL.md 支持时粘贴
 ├── output-styles/jianming-zhongwen.md   与规则块逐字相同
 ├── evals/
 │   ├── jm_lint.py                 linter，含 --self-test
@@ -273,7 +275,9 @@ The cost: every number in SKILL.md must be validated on a Chinese benchmark firs
 
 ### 2.3 Two registers
 
-The document (what you write or rewrite) and the reply (what you type in chat) each have their own rules. Reply rules apply first in every mode. This is the one position no Chinese project has taken.
+The document (what you write or rewrite) and the reply (what you type in chat) each have their own rules. The reply register is the one position no Chinese project has taken.
+
+The reply register is opt-in, never injected. It applies in two cases only: the jianming-zhongwen output style is selected, or the skill is invoked. SessionStart injects the document rules only and drops the paragraphs of the rule block that start with 回复（. The Stop hook checks only when the effective outputStyle is jianming-zhongwen, looking at settings.local.json, then the project settings.json, then the user settings.json, first one that sets it wins. A session that invoked the skill relies on the model; the hook does not check it. 1.0.x injected the reply rules into every session: from 2026-09-10 to 09-28 the Stop hook fired 326 times in 12 development sessions, 236 for more than five sentences and 220 for bold. The register was written for Q&A replies and the benchmark; inside coding sessions it fights normal formatting. The global simple-english output style also says "use a list for more than two items", so with both rule sets present the model can only pick one. Changed to opt-in on 2026-09-28, 1.1.0.
 
 Both registers cover Chinese only. English text and English replies go to whatever English tool the user installs, for example SimpleEnglish. The rule block says English is out of scope. The Stop hook skips a reply whose counted characters are under 30% Chinese, the same threshold as the paragraph filter on files.
 
@@ -364,11 +368,11 @@ Two confounds measured on 2026-09-09. A subagent sees every installed skill, and
 
 One repository is both marketplace and plugin. `marketplace.json` has `source` set to `./`. Install is two commands, update is one: `claude plugin update jianming-zhongwen@jianming-zhongwen`, or the `/plugin` screen in the app. The `version` field in `plugin.json` drives updates. A commit without a version bump never reaches users, so the release process makes the bump a hard step.
 
-Testing installs from GitHub, the same path users take. The Code tab of the desktop app has no `/plugin` command, so use the Claude Code binary the app bundles at `~/Library/Application Support/Claude/claude-code/<version>/claude.app/Contents/MacOS/claude`. It writes the same registry the app reads, `~/.claude/plugins/`. Commands: `plugin marketplace add heichaowo/jianming-zhongwen`, `plugin install jianming-zhongwen@jianming-zhongwen`; after a push, `plugin marketplace update jianming-zhongwen`, then `plugin update jianming-zhongwen@jianming-zhongwen`. `plugin update` keys on the version field, so a change under test also needs a version bump, or an uninstall and reinstall. Verify: open a new session and confirm the rule block is injected, write a reply over five sentences and confirm the Stop hook message.
+Testing installs from GitHub, the same path users take. The Code tab of the desktop app has no `/plugin` command, so use the Claude Code binary the app bundles at `~/Library/Application Support/Claude/claude-code/<version>/claude.app/Contents/MacOS/claude`. It writes the same registry the app reads, `~/.claude/plugins/`. Commands: `plugin marketplace add heichaowo/jianming-zhongwen`, `plugin install jianming-zhongwen@jianming-zhongwen`; after a push, `plugin marketplace update jianming-zhongwen`, then `plugin update jianming-zhongwen@jianming-zhongwen`. `plugin update` keys on the version field, so a change under test also needs a version bump, or an uninstall and reinstall. Verify: open a new session and confirm the document rules are injected. With the output style selected, write a reply over five sentences and confirm the Stop hook message.
 
 Rejected a local directory marketplace. The official docs do not allow a plugin source that points at the marketplace root itself, and a symlink to the repository is skipped because it resolves outside the marketplace, which leaves a wrapper copy plus a sync script. Tried once on 2026-09-09, it worked, but it duplicates "test updates from GitHub", so it was deleted.
 
-Three hooks, all Python, so the plugin needs python3 only. All three start through `src/hooks/py.sh`, which probes python3, python, and py -3 in that order and skips the Microsoft Store python3 stub on Windows, the same order as the shim in the official security-guidance plugin. With none of them it says so once on stderr and exits 0, because the hooks are advisory and a missing Python must not break the session. SessionStart writes the rule block from `prompts/system-prompt.md` to stdout as plain text, as SimpleEnglish 2.0.2 does in practice, with no JSON wrapper. It is capped at 9500 characters, with a fixed short rule set as fallback when the file is missing or too long. PostToolUse runs the linter after a Write or Edit on a .md file, exits 2, advisory only, and skips `.claude` directories and every path in `JIANMING_ZHONGWEN_LINT_EXCLUDE`. Stop runs reader_check on the last reply, skips a reply under 30% Chinese, returns one systemMessage on a violation, and always exits 0. The hook scripts reconfigure stdout and stderr to UTF-8 at startup so Chinese output works on Windows without a shell variable. 1.0.3 moved SessionStart from Node to Python: it only reads a file and prints it, Node was copied from SimpleEnglish, and the second runtime bought nothing. The output is byte-identical.
+Three hooks, all Python, so the plugin needs python3 only. All three start through `src/hooks/py.sh`, which probes python3, python, and py -3 in that order and skips the Microsoft Store python3 stub on Windows, the same order as the shim in the official security-guidance plugin. With none of them it says so once on stderr and exits 0, because the hooks are advisory and a missing Python must not break the session. SessionStart writes the document rules of the `prompts/system-prompt.md` rule block to stdout as plain text, as SimpleEnglish 2.0.2 does in practice, with no JSON wrapper. It is capped at 9500 characters, with a fixed short rule set as fallback when the file is missing or too long. PostToolUse runs the linter after a Write or Edit on a .md file, exits 2, advisory only, and skips `.claude` directories and every path in `JIANMING_ZHONGWEN_LINT_EXCLUDE`. Stop runs reader_check on the last reply only when the effective outputStyle is jianming-zhongwen, skips a reply under 30% Chinese, returns one systemMessage on a violation, and always exits 0. The hook scripts reconfigure stdout and stderr to UTF-8 at startup so Chinese output works on Windows without a shell variable. 1.0.3 moved SessionStart from Node to Python: it only reads a file and prints it, Node was copied from SimpleEnglish, and the second runtime bought nothing. The output is byte-identical.
 
 The body of `output-styles/jianming-zhongwen.md` is byte-identical to the rule block in `prompts/system-prompt.md`. `check_numbers.py` verifies this. The style is selected as `jianming-zhongwen:jianming-zhongwen`.
 

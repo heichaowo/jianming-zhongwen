@@ -47,6 +47,16 @@ class LintHookTest(unittest.TestCase):
         p.write_text(text, encoding="utf-8")
         return p
 
+    def stop(self, reply, user_style="jianming-zhongwen", project_style=None):
+        """Run the Stop hook with a user settings.json and, optionally, a project settings.local.json."""
+        cfg, proj = self.dir / "cfg", self.dir / "proj"
+        self.write("cfg/settings.json", json.dumps({"outputStyle": user_style} if user_style else {}))
+        if project_style:
+            self.write("proj/.claude/settings.local.json", json.dumps({"outputStyle": project_style}))
+        proj.mkdir(exist_ok=True)
+        event = {"hook_event_name": "Stop", "cwd": str(proj), "last_assistant_message": reply}
+        return run(event, env={"CLAUDE_CONFIG_DIR": str(cfg)})
+
     def test_violating_markdown_is_reported_with_exit_2(self):
         r = run(post_event(self.write("doc.md", SLOP)))
         self.assertEqual(r.returncode, 2, r)
@@ -89,7 +99,7 @@ class LintHookTest(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r)
 
     def test_stop_reports_a_bad_reply(self):
-        r = run({"hook_event_name": "Stop", "last_assistant_message": BAD_REPLY})
+        r = self.stop(BAD_REPLY)
         self.assertEqual(r.returncode, 0, r)
         out = json.loads(r.stdout)
         self.assertIn("systemMessage", out)
@@ -97,14 +107,26 @@ class LintHookTest(unittest.TestCase):
             self.assertIn(word, out["systemMessage"])
 
     def test_stop_stays_silent_on_a_clean_reply(self):
-        r = run({"hook_event_name": "Stop", "last_assistant_message": CLEAN_REPLY})
+        r = self.stop(CLEAN_REPLY)
         self.assertEqual(r.returncode, 0, r)
         self.assertEqual(r.stdout, "")
 
     def test_stop_skips_an_english_reply(self):
         english = "Sure! Here is the plan:\n\n- **Step one**: check the network.\n- Step two: check the firewall.\n\nThen restart. Retry. Check. Hope this helps!"
-        r = run({"hook_event_name": "Stop", "last_assistant_message": english})
+        r = self.stop(english)
         self.assertEqual(r.returncode, 0, r)
+        self.assertEqual(r.stdout, "")
+
+    def test_stop_is_silent_without_the_output_style(self):
+        for user_style in (None, "simple-english"):
+            r = self.stop(BAD_REPLY, user_style=user_style)
+            self.assertEqual(r.returncode, 0, r)
+            self.assertEqual(r.stdout, "", user_style)
+
+    def test_project_settings_override_the_user_style(self):
+        r = self.stop(BAD_REPLY, user_style="simple-english", project_style="jianming-zhongwen")
+        self.assertIn("systemMessage", r.stdout)
+        r = self.stop(BAD_REPLY, user_style="jianming-zhongwen", project_style="simple-english")
         self.assertEqual(r.stdout, "")
 
     def test_garbage_stdin_exits_0(self):
